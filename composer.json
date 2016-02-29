@@ -1,0 +1,23 @@
+{
+    "name": "mobilecart/frontendbundle",
+    "autoload": {
+        "psr-4" : {
+            "MobileCart\\FrontendBundle\\" : ""
+        }
+    },
+    "type": "project",
+    "description": "Frontend Theme for Mobile Cart : an E-Commerce Shopping Cart built on Symfony",
+    "keywords": ["shopping", "cart", "e-commerce"],
+    "homepage": "http://mobilecart.io",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jesse Hanson",
+            "email": "jesse@mobilecart.io"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.24",
+        "symfony/framework-bundle": "~2.8"
+    }
+}
