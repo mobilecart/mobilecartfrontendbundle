@@ -1,0 +1,142 @@
+body {
+    padding-top: 70px
+}
+
+header {
+    background: #000;
+}
+
+.slide-image {
+    width: 100%;
+}
+
+.carousel-holder {
+    margin-bottom: 30px;
+}
+
+.carousel-control,.item {
+    border-radius: 4px;
+}
+
+.caption {
+    height: 130px;
+    overflow: hidden;
+}
+
+.caption h4 {
+    white-space: nowrap;
+}
+
+.thumbnail img {
+    width: 100%;
+}
+
+.ratings {
+    color: #d17581;
+}
+
+.thumbnail .caption-full {
+    padding: 9px;
+    color: #333;
+}
+
+footer {
+    margin: 50px 0;
+}
+
+div.tab-panel {
+    border-top-color: #fff;
+    border-right-color: #ddd;
+    border-bottom-color: #ddd;
+    border-left-color: #ddd;
+    border-radius: 0;
+}
+
+/* Search in the navigation bar */
+
+.form-control.selectize-control{
+    /*height: 34px;*/
+}
+
+div.searchbox-container {
+    width: 77%;
+    padding-left: 15px;
+}
+
+@media(min-width:768px) {
+    div.searchbox-container {
+        width: 240px;
+    }
+}
+
+.selectize-dropdown-content img{ width:20px; height:20px; margin-right: 3px; float:left; }
+
+.selectize-control::before {
+    -moz-transition: opacity 0.2s;
+    -webkit-transition: opacity 0.2s;
+    transition: opacity 0.2s;
+    content: ' ';
+    z-index: 2;
+    position: absolute;
+    display: block;
+    top: 10px;
+    right: 34px;
+    width: 16px;
+    height: 16px;
+    background: url(../images/spinner.gif);
+    background-size: 16px 16px;
+    opacity: 0;
+}
+
+.arrow {
+    float: right;
+}
+
+.selectize-control.loading::before {
+    opacity: 1;
+}
+
+ul.side-menu li {
+    border-bottom: 1px solid #E7E7E7;
+}
+
+ul.nav-second-level li a {
+    padding-left: 37px;
+}
+
+button.navbar-toggle {
+    margin-top: 17px;
+}
+
+div.cart-dropdown {
+    width: 360px;
+    padding: 10px;
+}
+
+input#page {
+    width: 60px;
+}
+
+div.img-circle {
+    background: #eeeeee none repeat scroll 0 0;
+    font-size: 2em;
+    height: 45px;
+    margin: auto;
+    padding-top: 3px;
+    padding-left: 15px;
+    width: 45px;
+    border-radius: 50%;
+}
+
+div#co-accordion h2 {
+    padding-top: 9px;
+    font-size: 1.5em;
+}
+
+div#co-accordion h2 a {
+    display: block;
+}
+
+a.next-button {
+    margin-top: 10px;
+}

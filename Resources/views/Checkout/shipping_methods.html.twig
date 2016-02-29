@@ -1,0 +1,12 @@
+
+<ul>
+    {% set i = 0 %}
+    {% for method in shipping_methods %}
+    <li>
+        <label>{{ method.company }} {{ method.method }}</label>
+        <input type="radio" name="shipping_method" value="{{ method.code }}" {% if i == 0 %}checked="checked"{% endif %} />
+        {{ method.price }}
+    </li>
+    {% set i = i + 1 %}
+    {% endfor %}
+</ul>

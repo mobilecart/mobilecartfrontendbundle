@@ -1,0 +1,155 @@
+{% extends frontend() %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+
+{% block topnav %}
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container">
+
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <h1>Checkout</h1>
+
+        <div class="panel-group" id="co-accordion" role="tablist" aria-multiselectable="true">
+
+            {% set i = 0 %}
+            {% for section, sectionData in sections %}
+
+                <div class="panel panel-default">
+                    <div class="panel-heading section-heading" role="tab" id="heading-{{ section }}">
+                        <div class="row">
+                            <div class="col-xs-1">
+                                <div class="img-circle pull-left">{{ i + 1 }}</div>
+                            </div>
+                            <div class="col-xs-5">
+                                <h2 class="panel-title">
+                                    <a role="button" class="" data-toggle="collapse" data-parent="#co-accordion" href="#section-{{ section }}" aria-expanded="true" aria-controls="section-{{ section }}">{{ sectionData.label }}</a>
+                                </h2>
+                            </div>
+                            <div class="col-xs-6 text-right">
+                                <a role="button" class="btn btn-default collapse-toggle" data-toggle="collapse" data-parent="#co-accordion" href="#section-{{ section }}" aria-expanded="" aria-controls="section-{{ section }}">
+                                    <span class="input-group-btn"><i class="glyphicon {% if i == 0 %}glyphicon-minus{% else %}glyphicon-plus{% endif %}"> </i></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="section-{{ section }}" class="panel-collapse collapse{% if i == 0 %} in{% endif %} section-body" role="tabpanel" aria-labelledby="heading-{{ section }}">
+                        <div class="panel-body">
+
+                            {% if sectionData.fields is defined %}
+                                {% for field in sectionData.fields %}
+                                    {# assuming this is a sub-form #}
+                                    {{ form_row(form.offsetGet(section).offsetGet(field)) }}
+                                {% endfor %}
+                            {% elseif sectionData.template is defined %}
+                                {% include sectionData.template with sectionData %}
+                            {% endif %}
+
+                            <div class="row">
+                                <div class="col-xs-4">
+
+                                </div>
+                                <div class="col-xs-4">
+                                    <a role="button" data-section="{{ section }}" data-next-section="{{ sectionData.next_section_id }}" class="btn btn-success form-control next-button {% if sectionData.final_step is defined %}final-step{% endif %}">Next</a>
+                                    <div class="text-center spinner" style="display:none;">
+                                        <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% set i = i + 1 %}
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="confirm-order-modal" tabindex="-1" role="dialog" aria-labelledby="confirm-modal-label">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="confirm-modal-label">Confirm Order</h4>
+            </div>
+            <div class="modal-body"> </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-xs-4">
+                        <button class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                    </div>
+                    <div class="col-xs-4">
+                        <button class="btn btn-success submit-order form-control">Submit Order</button>
+                        <div class="text-center spinner" style="display:none;">
+                            <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+                        </div>
+                    </div>
+                    <div class="col-xs-4">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+
+    <script src="{{ asset('bundles/mobilecartfrontend/js/country-region-widget.js') }}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var countryRegions = {{ country_regions|json_encode|raw }};
+        var countryRegionWidget = new CountryRegionWidget({
+            countryRegions: countryRegions
+        });
+    </script>
+
+    <script src="{{ asset('bundles/mobilecartfrontend/js/checkout-widget.js') }}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+        var container = $('#co-accordion');
+        var checkoutSections = {{ widget_sections|json_encode|raw }};
+        var formName = '{{ form_name }}';
+        var totalsDiscountsUrl = '{{ totals_discounts_url }}';
+        var totalsDiscountsSection = '{{ totals_discounts_section }}';
+        var confirmOrderUrl = '{{ confirm_order_url }}';
+        var confirmOrderModal = $('#confirm-order-modal');
+        var submitOrderUrl = '{{ submit_order_url }}';
+        var submitOrderData = {};
+
+        var checkout = new CheckoutWidget({
+            container: container,
+            sections: checkoutSections,
+            formName: formName,
+            totalsDiscountsUrl: totalsDiscountsUrl,
+            totalsDiscountsSection: totalsDiscountsSection,
+            confirmOrderUrl: confirmOrderUrl,
+            confirmOrderModal: confirmOrderModal,
+            submitOrderUrl: submitOrderUrl,
+            submitOrderData: submitOrderData
+        });
+
+    </script>
+
+    {% for section, sectionData in sections %}
+        {% if sectionData.js_template is defined %}
+            {% include sectionData.js_template with sectionData %}
+        {% endif %}
+    {% endfor %}
+
+{% endblock %}

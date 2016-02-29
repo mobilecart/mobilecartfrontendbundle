@@ -1,0 +1,302 @@
+{% extends frontend() %}
+
+{% block searchTerm %}{{ search.searchTerm }}{% endblock %}
+
+{% block content %}
+
+{#% if result.searchQuery is defined %}
+    <div><pre>{{ result.searchQuery }}</pre></div>
+{% endif %}
+{% if result.facetQuery is defined %}
+    <div><pre>{{ result.facetQuery }}</pre></div>
+{% endif %#}
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row carousel-holder">
+
+                <div class="col-md-12">
+                    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+                        <ol class="carousel-indicators">
+                            <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                            <li data-target="#carousel-example-generic" data-slide-to="1" class=""></li>
+                            <li data-target="#carousel-example-generic" data-slide-to="2" class=""></li>
+                        </ol>
+                        <div class="carousel-inner">
+                            <div class="item active">
+                                <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
+                            </div>
+                            <div class="item">
+                                <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
+                            </div>
+                            <div class="item">
+                                <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
+                            </div>
+                        </div>
+                        <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                        </a>
+                        <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <form id="pager-form" action="{{ path('cart_products') }}">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="input-group">
+                {% if search.query|length > 0 %}
+                <span class="input-group-btn">
+                    <button class="btn btn-default search-clear" type="button">
+                        <i class="glyphicon glyphicon-remove"></i>
+                    </button>
+                </span>
+                {% endif %}
+                <input type="text" id="text-search" class="form-control search-query" name="{{ search.queryparam }}" value="{{ search.query }}" placeholder="Search..." />
+                <span class="input-group-btn">
+                    <button class="btn btn-default search-submit" type="button">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+    {% if result.total > 0 %}
+    <div class="row sorting pager">
+        <!--
+        <div class="col-sm-4">
+            <div class="btn-group">
+                <a class="btn btn-default btn-sm" id="list" href="#">
+                    <span class="glyphicon glyphicon-th-list"></span>List
+                </a>
+                <a class="btn btn-default btn-sm" id="grid" href="#">
+                    <span class="glyphicon glyphicon-th"></span>Grid
+                </a>
+            </div>
+        </div>
+        -->
+        <div class="col-sm-4">
+
+        </div>
+        <div class="col-sm-4">
+            <select name="sort" id="sort-by">
+                {% for sortable in sortable('product') %}
+                    <option data-dir="{{ sortable.dir }}" value="{{ sortable.value }}"{% if sortable.active %} selected="selected"{% endif %}>{{ sortable.label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-sm-4">
+            <div class="pull-right btn-group input-group" role="group">
+                <button type="button" class="btn pull-left btn-default prev {% if search.page <= 1 %}disabled{% endif %}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </button>
+                <input type="number" id="page" class="form-control number" name="{{ search.pageParam }}" value="{{ search.page }}" />
+                <button type="button" class="btn pull-right btn-default next {% if search.page >= result.pages %}disabled{% endif %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </button>
+            </div>
+        </div>
+
+        <input type="hidden" name="direction" id="sort-dir" value="{{ sortDir() }}" />
+        {% for filterCode, filterValue in search.facetFilters %}
+            <input type="hidden" name="{{ filterCode }}" value="{{ filterValue }}" />
+        {% endfor %}
+
+        <input type="checkbox" class="hide" id="is_on_sale" name="is_on_sale" value="1"{% if app.request.get('is_on_sale') == 1 %} checked="checked"{% endif %}/>
+        <input type="checkbox" class="hide" id="is_new" name="is_new" value="1"{% if app.request.get('is_new') == 1 %} checked="checked"{% endif %}/>
+
+    </div>
+    {% endif %}
+    </form>
+    {% if result.total > 0 %}
+    <div class="row">
+        <div class="col-md-3">
+            <nav role="navigation" class="navbar-default navbar-static-side ">
+                <div class="sidebar sidebar-collapse">
+                    <ul id="side-menu" class="nav">
+                        {% include templatePath('Product:facet-list.html.twig') with result %}
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="col-md-9 product-list">
+
+        {% if result.entities is defined and not isSpaEnabled() %}
+            {% for entity in result.entities %}
+                <div class="col-sm-4 col-lg-4 col-md-4">
+                    <div class="thumbnail">
+                        <a href="{{ path('cart_product_view', { 'slug': entity.slug }) }}">
+                            <img src="{{ asset('/bundles/mobilecartfrontend/images/320x150.gif') }}" alt="">
+                        </a>
+
+                        <div class="caption">
+                            <h4><a href="{{ path('cart_product_view', { 'slug': entity.slug }) }}">{{ entity.name }}</a></h4>
+                            <h4>{{ decorate(entity.price) }}</h4>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <form method="post" class="add-to-cart" action="{{ path('cart_add_item', {'id':entity.id}) }}">
+                                    {% if entity.type > 1 %}
+                                        <input type="hidden" id="simple_id" name="simple_id" value="" />
+                                    {% endif %}
+
+                                    {% if entity.is_in_stock %}
+                                        <button type="submit" class="btn btn-primary addtocart pull-right"><i class="glyphicon glyphicon-shopping-cart icon-white"> </i>Add to Cart</button>
+                                    {% elseif entity.can_backorder %}
+                                        <button type="submit" class="btn btn-primary addtocart pull-right">Backorder</button>
+                                    {% else %}
+                                        <p>Currently Unavailable</p>
+                                    {% endif %}
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+
+        </div>
+    </div><!-- /row -->
+
+    <div class="row sorting-bottom pager-bottom">
+
+    </div>
+    {% else %}
+
+    <div class="row">
+        <div class="col-xs-12">
+            <p>Empty Search Results</p>
+        </div>
+    </div>
+
+    {% endif %}
+
+</div><!-- /container -->
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+
+    {% if isSpaEnabled() %}
+
+    <script src="{{ asset('bundles/mobilecartfrontend/js/spin.min.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartfrontend/js/cart.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartfrontend/js/product-listing.js') }}"></script>
+
+    <script type="text/javascript">
+        $(function(){
+
+            App.collections.paginatedItems = new App.collections.PaginatedCollection();
+            App.collections.paginatedItems.url = '{{ path('cart_products') }}';
+
+            {% if search.categoryId > 0 %}
+            App.collections.paginatedItems.queryParams['cat_id'] = {{ search.categoryId }};
+            {% endif %}
+
+            App.views.app = new App.views.AppView({collection: App.collections.paginatedItems});
+            App.views.pagination = new App.views.PaginatedView({collection:App.collections.paginatedItems});
+            //App.views.sorting = new App.views.SortedView({collection:App.collections.paginatedItems});
+            App.collections.paginatedItems.fetch();
+
+            App.collections.cartInfo = new App.collections.CartInfoCollection();
+            App.collections.cartInfo.fetch();
+
+            //Backbone.history.start({pushState: true});
+        });
+    </script>
+
+    {% else %}
+
+    <script type="text/javascript">
+        $(function(){
+
+            var pagerForm = $('#pager-form');
+            var pageInput = $('input#page');
+            var sortByInput = $('select#sort-by');
+            var sortDirInput = $('input#sort-dir');
+            var newFilter = $('input#is-new');
+            var saleFilter = $('input#is-on-sale');
+            var textInput = $('input#text-search');
+
+            // paginator previous
+            $('button.prev').click(function(e){
+                e.preventDefault();
+                var el = $('input#page');
+                var page = parseInt(el.val()) - 1;
+                el.val(page);
+                pagerForm.submit();
+                return false;
+            });
+
+            // paginator next
+            $('button.next').click(function(e){
+                e.preventDefault();
+                var page = parseInt(pageInput.val()) + 1;
+                pageInput.val(page);
+                pagerForm.submit();
+                return false;
+            });
+
+            $('a.search-filter-link').click(function(e){
+                e.preventDefault();
+                var self = $(this);
+                var rel = self.attr('rel');
+                var relEl = $('input#' + rel);
+                if (relEl.attr('checked') == 'checked') {
+                    relEl.prop('checked', false);
+                } else {
+                    relEl.prop('checked', true);
+                }
+
+                pageInput.val(1);
+                pagerForm.submit();
+                return true;
+            });
+
+            $('button.search-submit').click(function(e){
+                pageInput.val(1);
+                pagerForm.submit();
+                return true;
+            });
+
+            $('button.search-clear').click(function(e){
+                textInput.val('');
+                pagerForm.submit();
+                return true;
+            });
+
+            // sort dropdown
+            sortByInput.change(function(e){
+                e.preventDefault();
+                var option = sortByInput.find(':selected');
+                var sortDir = option.attr('data-dir');
+                sortDirInput.val(sortDir);
+                pagerForm.submit();
+                return false;
+            });
+
+            // fulltext search-query
+            textInput.keypress(function(e){
+                // todo : auto search
+                if (e.which == 13) {
+                    pagerForm.submit();
+                }
+            });
+
+        });
+    </script>
+
+    {% endif %}
+
+{% endblock %}

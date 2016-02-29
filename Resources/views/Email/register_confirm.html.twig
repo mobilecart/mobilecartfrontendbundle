@@ -1,0 +1,7 @@
+{% extends 'MobileCartFrontendBundle::email-layout.html.twig' %}
+
+{% block content %}
+<p>Hello {{ first_name }} {{ last_name }},</p>
+<p>Thank you for registering.</p>
+<p>Please click this link to confirm your account: <a href="{{ url }}">{{ url }}</a> .</p>
+{% endblock %}

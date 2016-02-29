@@ -1,0 +1,295 @@
+{% extends 'MobileCartFrontendBundle::base.html.twig' %}
+
+{% block stylesheets %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ asset('bundles/mobilecartfrontend/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/mobilecartfrontend/font-awesome/css/font-awesome.css') }}" rel="stylesheet">
+    <link href="{{ asset('bundles/mobilecartfrontend/css/styles.css') }}" rel="stylesheet">
+
+{% endblock %}
+
+{% block javascripts %}
+
+    <script type="text/javascript">
+        window.App = {};
+        App.collections = {};
+        App.models = {};
+        App.views = {};
+        App.serverURL = '{{ path('_home') }}';
+    </script>
+
+    <script src="{{ asset('bundles/mobilecartfrontend/js/json2.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartfrontend/js/jquery-1.11.0.min.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartfrontend/js/underscore.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartfrontend/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartfrontend/js/jquery.metisMenu.js') }}"></script>
+    <script type="text/javascript">
+        $('#side-menu').metisMenu();
+    </script>
+
+    <!-- add your own js here to further populate App -->
+
+    {% if isSpaEnabled() %}
+
+    <script src="{{ asset('bundles/mobilecartfrontend/js/backbone-min.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartfrontend/js/backbone.localStorage.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartfrontend/js/backbone.paginator.min.js') }}"></script>
+
+    <script type="text/html" id="paginationTemplate">
+        <% if (currentPage != 1) { %>
+        <button class="prev btn-default btn">Prev</button>
+        <% } %>
+        <div class="btn-group">
+            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Page <%= currentPage %> <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <% for(p=1;p<=totalPages;p++){ %>
+                <% if (currentPage == p) { %>
+                <li class="active"><a href="#" class="page"><%= p %></a></li>
+                <% } else { %>
+                <li><a href="#" class="page"><%= p %></a></li>
+                <% } %>
+                <% }%>
+            </ul>
+        </div>
+        <% if (lastPage != currentPage && lastPage != 0) { %>
+        <button class="btn btn-default next">Next</button>
+        <% } %>
+    </script>
+
+    <script type="text/html" id="sortingTemplate">
+        <div class="btn-group">
+            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Sort by <strong><span id="sortByText">popularity</span></strong> <span class="caret"></span></button>
+            <ul class="dropdown-menu sort-by">
+                <li><a href="date">Date</a></li>
+                <li><a href="name">Name</a></li>
+                <li><a href="popularity">Popularity</a></li>
+            </ul>
+        </div>
+    </script>
+
+    <script type="text/template" id="facetLabel">
+        <a href="#" class="facet-label"><%- label %><i class="fa fa-arrow"></i></a>
+    </script>
+
+    <script type="text/template" id="active-facet-link">
+        <% if (typeof(remove_url) != "undefined" && remove_url.length > 0) { %>
+        <a href="<%- remove_url %>" class="facet-remove-link">
+            <i class="fa fa-times"></i>
+            <%- label %> : <%- term %>
+            <span class="badge pull-right"><%- count %></span>
+        </a>
+        <% } %>
+    </script>
+
+    <script type="text/template" id="facetLink">
+        <% if (typeof(remove_url) != "undefined" && remove_url.length > 0) { %>
+        <a href="<%- remove_url %>" class="facet-remove-link">
+            <i class="fa fa-times"></i>
+            <%- term %>
+            <span class="badge pull-right"><%- count %></span>
+        </a>
+        <% } else { %>
+        <a href="<%- url %>" class="facet-link"><%- term %>
+            <span class="badge pull-right"><%- count %></span>
+        </a>
+        <% } %>
+    </script>
+
+    <script type="text/template" id="cart-total">
+        <div class="row">
+            <div class="col-xs-6"><%- label %></div>
+            <div class="col-xs-6"><%- value %></div>
+        </div>
+    </script>
+
+    <!-- todo: pass url as parameter -->
+    <script type="text/template" id="cart-item">
+        <div class="row">
+            <div class="col-xs-8">
+                <a href="/<%- slug %>"><%- name %></a>
+            </div>
+            <div class="col-xs-4"><%- qty %> x <%- price %></div>
+        </div>
+    </script>
+
+    <script type="text/template" id="cart-buttons">
+        <div class="row">
+            <div class="col-xs-6">
+                <a class="btn btn-default" href="/cart/view">View Cart</a>
+            </div>
+            <div class="col-xs-6">
+                <a class="btn btn-success" href="/cart/checkout">Checkout</a>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="product-grid-single">
+
+        <div class="thumbnail">
+            <a href="/<%- slug %>"><img alt="" src="/bundles/mobilecartfrontend/images/320x150.gif"></a>
+            <div class="caption">
+                <h4><a href="/<%- slug %>"><%- name %></a></h4>
+                <h4>$<%- price %></h4>
+                <p></p>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="ratings">
+                        <p>15 Reviews<br>
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <a href="/cart/add/<%- id %>" rel="nofollow" class="btn btn-primary addtocart">Add to Cart</a>
+                </div>
+            </div>
+        </div>
+
+    </script>
+
+    {% endif %}
+
+
+{% endblock %}
+
+{% block body %}
+
+{% block topnav %}
+
+<header>
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="header-links">
+
+                {% block navigation %}
+                <div class="collapse navbar-collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li><a href="{{ path('cart_home') }}">Home</a></li>
+                        <li><a href="{{ path('cart_products') }}">Products</a></li>
+                        <li><a href="{{ path('cart_categories') }}">Categories</a></li>
+                        <li class="dropdown header-cart">
+                            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                                <i class="glyphicon glyphicon-shopping-cart icon-white"> </i>
+                                <b class="caret"></b>
+                            </a>
+                            <div class="dropdown-menu cart-dropdown">
+                                {% for total in cartTotals() %}
+                                <div class="row">
+                                    <div class="col-xs-6">{{ total.label }}</div>
+                                    <div class="col-xs-6">{{ decorate(total.value) }}</div>
+                                </div>
+                                {% endfor %}
+
+                                {% for item in cartItems() %}
+                                <div class="row">
+                                    <div class="col-xs-8">
+                                        <a href="{{ path('cart_product_view', { 'slug': item.get('slug') }) }}">{{ item.get('name') }}</a>
+                                    </div>
+                                    <div class="col-xs-4">{{ item.get('qty') }} x {{ decorate(item.get('price')) }}</div>
+                                </div>
+                                {% endfor %}
+
+                                <div class="row">
+                                    <div class="col-xs-6">
+                                        <a href="{{ path('cart_view') }}" class="btn btn-default">View Cart</a>
+                                    </div>
+                                    <div class="col-xs-6 text-right">
+                                        <a href="{{ path('cart_checkout') }}" class="btn btn-success">Checkout</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ currencySymbol() }} <b class="caret"></b></a>
+                            <ul class="pull-right dropdown-menu">
+                                <li><a href="{{ path('cart_currency', {'code':'EUR'}) }}">€</a></li>
+                                <li><a href="{{ path('cart_currency', {'code':'USD'}) }}">$</a></li>
+                            </ul>
+                        </li>
+                        <!--
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">ENG <b class="caret"></b></a>
+                            <ul class="pull-right dropdown-menu">
+                                <li><a href="#" tabindex="-1">English</a></li>
+                                <li><a href="#" tabindex="-1">French</a></li>
+                            </ul>
+                        </li>
+                        -->
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account <b class="caret"></b></a>
+                            <ul class="pull-right dropdown-menu">
+                                {% if is_granted('IS_AUTHENTICATED_FULLY') %}
+                                    <li><a href="{{ path('customer_profile') }}">Profile</a></li>
+                                    <li><a href="{{ path('logout') }}">Logout</a></li>
+                                {% else %}
+                                    <li><a href="{{ path('login_route') }}">Login</a></li>
+                                    <li><a href="{{ path('customer_register') }}">Register</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</header>
+
+{% endblock %}
+{% block sidebar %}
+
+{% endblock %}
+{% block content_wrapper %}
+
+    <div class="container">
+        <div class="row alerts">
+
+            {% for state in ['info', 'warning', 'success', 'danger'] %}
+                {% for flashMessages in app.session.flashbag.get(state) %}
+                    {% for flashMessage in flashMessages %}
+                        <div class="alert alert-{{ state }} alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            {{ flashMessage }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            {% endfor %}
+
+        </div>
+    </div>
+
+    {% block content %}
+
+    {% endblock %}
+{% endblock %}
+{% block footer %}
+
+    <hr>
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright &copy; Company Name</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+{% endblock %}
+
+{% endblock %}
