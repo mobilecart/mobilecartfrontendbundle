@@ -185,9 +185,18 @@ CheckoutWidget.prototype = {
             widget.confirmOrderModal.modal('show');
         });
     },
+    preSubmitOrder: function() {
+        // over-ride this method for submitting tokenized payments, etc
+        return true;
+    },
     submitOrder: function(buttonEl) {
         var widget = this;
         // open a section with errors, close all other sections
+
+        if (!widget.preSubmitOrder()) {
+            buttonEl.show();
+            return false;
+        }
 
         // send request
         $.ajax({
@@ -212,5 +221,7 @@ CheckoutWidget.prototype = {
 
             }
         });
+
+        return false;
     }
 };

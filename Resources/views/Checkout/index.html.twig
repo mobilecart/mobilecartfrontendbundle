@@ -152,4 +152,14 @@
         {% endif %}
     {% endfor %}
 
+    {% for javascript in javascripts %}
+        {% if javascript.url is defined %}
+            <script type="text/javascript" src="{{ javascript.url }}"></script>
+        {% elseif javascript.asset is defined %}
+            <script src="{{ asset(javascript.asset) }}" type="text/javascript"></script>
+        {% elseif javascript.js_template is defined %}
+            {% include javascript.js_template %}
+        {% endif %}
+    {% endfor %}
+
 {% endblock %}
