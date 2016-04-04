@@ -57,6 +57,19 @@ CheckoutWidget.prototype = {
             }
         });
     },
+    paymentHandlers: {
+        /*
+
+        HOWTO:
+
+        * add methods to this object, and use the payment code as the key, eg
+            checkoutWidget.paymentHandlers['dummy'] = function() { };
+
+        * do this from your own javascript, which loads at the bottom of Checkout/index.html.twig
+            by adding data to $returnData['javascripts'] in event listeners
+
+        //*/
+    },
     updateSection: function(buttonEl) {
 
         var widget = this;
@@ -76,7 +89,10 @@ CheckoutWidget.prototype = {
 
         // todo : look for input fields, if defined
 
-        if (typeof sectionData['fields'] != 'undefined') {
+        if (sectionKey == 'payment_methods') {
+            var method = section.find("input[name='payment_method']").val();
+            postData = widget.paymentHandlers[method]();
+        } else if (typeof sectionData['fields'] != 'undefined') {
 
             for (var x = 0; x < sectionData['fields'].length; x++) {
                 var field = sectionData['fields'][x];
@@ -186,7 +202,7 @@ CheckoutWidget.prototype = {
         });
     },
     preSubmitOrder: function() {
-        // over-ride this method for submitting tokenized payments, etc
+        // over-ride this method if necessary
         return true;
     },
     submitOrder: function(buttonEl) {
