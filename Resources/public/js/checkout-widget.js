@@ -70,7 +70,13 @@ CheckoutWidget.prototype = {
 
         //*/
     },
-    updateSection: function(buttonEl) {
+    /**
+     *
+     * @param buttonEl
+     * @param callbackData - mostly for payment callbacks. allow js to callback
+     * @returns {boolean}
+     */
+    updateSection: function(buttonEl, callbackData) {
 
         var widget = this;
 
@@ -84,31 +90,44 @@ CheckoutWidget.prototype = {
 
         section.find('.has-error').removeClass('has-error');
 
-        // build request from section
         var postData = {};
+
+        // build request from section
+        if (typeof callbackData != 'undefined') {
+            postData = callbackData;
+        }
 
         // todo : look for input fields, if defined
 
         if (sectionKey == 'payment_methods') {
-            var method = section.find("input[name='payment_method']").val();
-            postData = widget.paymentHandlers[method]();
-        } else if (typeof sectionData['fields'] != 'undefined') {
-
-            for (var x = 0; x < sectionData['fields'].length; x++) {
-                var field = sectionData['fields'][x];
-                var inputId = widget.elPrefix + '_' + sectionKey + '_' + field;
-                var input = $('#' + inputId);
-                postData[field] = input.val();
+            if (typeof callbackData == 'undefined') {
+                var method = section.find("input[name='payment_method']").val();
+                postData = widget.paymentHandlers[method](buttonEl);
+                if (typeof postData.callback != 'undefined') {
+                    return false;
+                }
             }
-
         } else {
+            if (typeof sectionData['fields'] != 'undefined') {
 
-            section.find('input, select, textarea').each(function(e){
-                var input = $(this);
-                var name = input.attr('name');
-                postData[name] = input.val();
-            });
+                for (var x = 0; x < sectionData['fields'].length; x++) {
+                    var field = sectionData['fields'][x];
+                    var inputId = widget.elPrefix + '_' + sectionKey + '_' + field;
+                    var input = $('#' + inputId);
+                    postData[field] = input.val();
+                }
+
+            } else {
+
+                section.find('input, select, textarea').each(function(e){
+                    var input = $(this);
+                    var name = input.attr('name');
+                    postData[name] = input.val();
+                });
+            }
         }
+
+
 
         var url = sectionData['post_url'];
 
