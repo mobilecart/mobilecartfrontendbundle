@@ -127,8 +127,6 @@ CheckoutWidget.prototype = {
             }
         }
 
-
-
         var url = sectionData['post_url'];
 
         // send request
@@ -137,6 +135,11 @@ CheckoutWidget.prototype = {
             dataType: 'json',
             type: 'POST',
             data: postData
+        }).error(function(jqxhr, status, errorThrown){
+
+            buttonEl.show();
+            buttonEl.siblings('.spinner').hide();
+
         }).done(function(response){
 
             buttonEl.show();
