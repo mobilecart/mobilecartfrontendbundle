@@ -8,7 +8,6 @@ var CheckoutWidget = function(obj) {
     this.confirmOrderUrl = obj.confirmOrderUrl;
     this.confirmOrderModal = obj.confirmOrderModal;
     this.submitOrderUrl = obj.submitOrderUrl;
-    this.submitOrderData = obj.submitOrderData;
     this.attachEvents();
     return this;
 };
@@ -63,7 +62,7 @@ CheckoutWidget.prototype = {
         HOWTO:
 
         * add methods to this object, and use the payment code as the key, eg
-            checkoutWidget.paymentHandlers['dummy'] = function() { };
+            checkoutWidget.paymentHandlers['dummy'] = function(buttonEl) { };
 
         * do this from your own javascript, which loads at the bottom of Checkout/index.html.twig
             by adding data to $returnData['javascripts'] in event listeners
@@ -241,7 +240,7 @@ CheckoutWidget.prototype = {
             url: widget.submitOrderUrl,
             dataType: 'json',
             type: 'POST',
-            data: widget.submitOrderData
+            data: {}
         }).done(function(response){
 
             buttonEl.siblings('.spinner').hide();
