@@ -68,7 +68,7 @@
             </div>
         </div>
     </div>
-    {% if result.total > 0 %}
+
     <div class="row sorting pager">
         <!--
         <div class="col-sm-4">
@@ -113,7 +113,7 @@
         <input type="checkbox" class="hide" id="is_new" name="is_new" value="1"{% if app.request.get('is_new') == 1 %} checked="checked"{% endif %}/>
 
     </div>
-    {% endif %}
+
     </form>
     {% if result.total > 0 %}
     <div class="row">

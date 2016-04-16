@@ -12,6 +12,7 @@
     {% endfor %}
 {% endif %}
 
+{#
 <li>
     <a href="#" rel="is_on_sale" class="search-filter-link">
         {% if app.request.get('is_on_sale') == 1 %}<i class="fa fa-times"></i>{% endif %}
@@ -25,6 +26,7 @@
         New
     </a>
 </li>
+#}
 
 {% if result.facetCounts is defined and not isSpaEnabled() %}
     {% for facet, facets in result.facetCounts %}
