@@ -4,29 +4,13 @@
             {% if facet.remove_url is defined and facet.remove_url|length > 0 %}
                 <a href="{{ facet.remove_url }}">
                     <i class="fa fa-times"></i>
-                    {{ facet.label }} : {{ facet.term }}
+                    {{ facet.label }} : {{ facet.term|humanize }}
                     {% if facet.count > 0 %} <span class="badge pull-right">{{ facet.count }}</span>{% endif %}
                 </a>
             {% endif %}
         </li>
     {% endfor %}
 {% endif %}
-
-{#
-<li>
-    <a href="#" rel="is_on_sale" class="search-filter-link">
-        {% if app.request.get('is_on_sale') == 1 %}<i class="fa fa-times"></i>{% endif %}
-        On Sale
-    </a>
-</li>
-
-<li>
-    <a href="#" rel="is_new" class="search-filter-link">
-        {% if app.request.get('is_new') == 1 %}<i class="fa fa-times"></i>{% endif %}
-        New
-    </a>
-</li>
-#}
 
 {% if result.facetCounts is defined and not isSpaEnabled() %}
     {% for facet, facets in result.facetCounts %}
@@ -37,11 +21,11 @@
                 {% for termCounts in facets.terms %}
                     <li>
                     {% if termCounts.remove_url is defined and termCounts.remove_url|length > 0 %}
-                        <a href="{{ termCounts.remove_url }}">{{ termCounts.term }}
+                        <a href="{{ termCounts.remove_url }}">{{ termCounts.term|humanize }}
                             {% if termCounts.count > 0 %} <span class="badge pull-right">{{ termCounts.count }}</span>{% endif %}
                         </a>
                     {% else %}
-                        <a href="{{ termCounts.url }}">{{ termCounts.term }}
+                        <a href="{{ termCounts.url }}">{{ termCounts.term|humanize }}
                             {% if termCounts.count > 0 %} <span class="badge pull-right">{{ termCounts.count }}</span>{% endif %}
                         </a>
                     {% endif %}
