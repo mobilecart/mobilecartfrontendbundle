@@ -122,6 +122,7 @@
 
     <script type="text/javascript">
 
+        {# todo: make the widget use less concrete variables, handle an array of object params instead #}
         var container = $('#co-accordion');
         var checkoutSections = {{ widget_sections|json_encode|raw }};
         var formName = '{{ form_name }}';

@@ -1,0 +1,92 @@
+<script type="text/javascript">
+
+    var CartWidget = function(obj) {
+        this.containerEl = obj.containerEl;
+        this.url = obj.url;
+        this.attachEvents();
+        return this;
+    };
+
+    CartWidget.prototype = {
+        containerEl: {},
+        url: '',
+        attachEvents: function() {
+            var self = this;
+
+            // Note : need to assume here that the elements are constantly being re-populated with ajax html responses
+
+            // change qty on a cart item
+            // change shipping method
+            // change promo code, update
+
+            self.containerEl.on('change', 'input[name="shipping_method"]', function(){
+
+                var code = $(this).val();
+
+                var values = {
+                    shipping_method: code
+                };
+
+                var updateUrl = '{{ path('cart_shipment_add') }}' + '?format=json';
+
+                $.ajax({
+                    url: updateUrl,
+                    method: 'POST',
+                    dataType: 'json',
+                    data: values
+                }).done(function(){
+                    self.render();
+                });
+            });
+
+            self.containerEl.on('change', 'input.qty-input', function(){
+
+                // first gather all qty inputs, and their values
+
+                self.containerEl.find('div.totals-container .spinner').show();
+
+                var values = {};
+                self.containerEl.find('input.qty-input').each(function(){
+                    var qtyInput = $(this);
+                    var key = qtyInput.attr('name');
+                    var value = qtyInput.val();
+                    values[key] = value;
+                });
+
+                // update qtys
+
+                var updateUrl = '{{ path('cart_update_qtys') }}' + '?format=json';
+
+                $.ajax({
+                    url: updateUrl,
+                    method: 'POST',
+                    dataType: 'json',
+                    data: values
+                }).done(function(){
+                    self.render();
+                });
+            });
+
+        },
+        render: function() {
+            var self = this;
+            $.ajax({
+                url: self.url
+            }).done(function(html){
+                self.containerEl.find('div.panel-body div.container').replaceWith(html);
+            });
+
+            return self;
+        }
+    };
+
+</script>
+
+<script type="text/javascript">
+    var containerEl = $('div#section-totals_discounts');
+    var url = '{{ path('cart_checkout_totals_discounts') }}';
+    var cartWidget = new CartWidget({
+        containerEl: containerEl,
+        url: url
+    });
+</script>
