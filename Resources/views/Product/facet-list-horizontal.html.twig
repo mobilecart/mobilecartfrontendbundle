@@ -1,0 +1,31 @@
+
+{% if result.facetCounts is defined and not isSpaEnabled() %}
+    {% set counter = 1 %}
+    {% for facet, facets in result.facetCounts %}
+        {% if facets.terms %}
+            <div class="dropdown pull-left facet-nav">
+                <button class="btn btn-default dropdown-toggle" type="button" id="facet-{{ counter }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    {{ facets.label }}
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="facet-{{ counter }}">
+                {% for termCounts in facets.terms %}
+                    <li class="navbar-dropdown">
+                    {% if termCounts.remove_url is defined and termCounts.remove_url|length > 0 %}
+                        <a href="{{ termCounts.remove_url }}"><i class="fa fa-times"></i>
+                            {{ termCounts.term|humanize }}
+                            {% if termCounts.count > 0 %} <span class="badge nav-badge pull-right">{{ termCounts.count }}</span>{% endif %}
+                        </a>
+                    {% else %}
+                        <a href="{{ termCounts.url }}">{{ termCounts.term|humanize }}
+                            {% if termCounts.count > 0 %} <span class="badge nav-badge pull-right">{{ termCounts.count }}</span>{% endif %}
+                        </a>
+                    {% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% set counter = counter + 1 %}
+    {% endfor %}
+{% endif %}
