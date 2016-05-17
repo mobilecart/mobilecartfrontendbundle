@@ -51,7 +51,7 @@
     <form id="pager-form" action="{{ path('cart_products') }}">
     <div class="row">
         <div class="col-sm-12">
-            <div class="input-group">
+            <div id="scrollable-dropdown-menu" class="input-group">
                 {% if search.query|length > 0 %}
                 <span class="input-group-btn">
                     <button class="btn btn-default search-clear" type="button">
@@ -59,7 +59,7 @@
                     </button>
                 </span>
                 {% endif %}
-                <input type="text" id="text-search" class="form-control search-query" name="{{ search.queryparam }}" value="{{ search.query }}" placeholder="Search..." />
+                <input type="text" data-provide="typeahead" autocomplete="off" id="text-search" class="form-control search-query typeahead" name="{{ search.queryparam }}" value="{{ search.query }}" placeholder="Search..." />
                 <span class="input-group-btn">
                     <button class="btn btn-default search-submit" type="button">
                         <i class="fa fa-search"></i>
@@ -237,6 +237,8 @@
 
     {% else %}
 
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/typeahead.bundle.min.js') }}"></script>
+
     <script type="text/javascript">
         $(function(){
 
@@ -244,8 +246,6 @@
             var pageInput = $('input#page');
             var sortByInput = $('input[name="sort"]');
             var sortDirInput = $('input#sort-dir');
-            var newFilter = $('input#is-new');
-            var saleFilter = $('input#is-on-sale');
             var textInput = $('input#text-search');
 
             // paginator previous
@@ -323,6 +323,34 @@
                     pagerForm.submit();
                 }
             });
+
+            var searchURL = "{{ path('cart_products') }}" + "?format=json&q=%QUERY";
+            var engine = new Bloodhound({
+                remote: {
+                    url: searchURL,
+                    wildcard: '%QUERY',
+                    transform: function(response) {
+                        return response.result.entities;
+                    }
+                },
+                identify: function(obj) {
+                    return obj.id;
+                },
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                datumTokenizer: Bloodhound.tokenizers.whitespace
+            });
+
+            $('input.typeahead').typeahead({
+                    minLength: 2,
+                    highlight: true
+                },
+                {
+                    name: 'products',
+                    display: 'name',
+                    displayKey: 'name',
+                    source: engine
+                }
+            );
 
         });
     </script>
