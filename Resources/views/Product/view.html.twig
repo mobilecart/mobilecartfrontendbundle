@@ -124,13 +124,35 @@
 <div class="container">
     <div class="row">
 
-        <div class="col-sm-6">
-            <div class="well">
-                <img class="img-responsive" src="{{ asset(imagePath('product', entity, 'view_jumbo')) }}" alt="" />
+        <div class="col-sm-12">
+
+            <img class="slide-image" src="{{ asset(imagePath('product', entity, 'view_jumbo')) }}" alt="" />
+
+        </div>
+    </div>
+    <div class="row">
+
+
+        <div class="col-sm-12 col-md-6">
+
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#general" data-toggle="tab" aria-expanded="true">General</a>
+                </li>
+                <li>
+                    <a href="#misc" data-toggle="tab" aria-expanded="false">Misc</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="general" class="tab-pane fade active in">
+                    <p>{{ entity.content }}</p>
+                </div>
+                <div id="misc" class="tab-pane">
+                    <p>misc stuff bla bla</p>
+                </div>
             </div>
         </div>
-
-        <div class="col-sm-6">
+        <div class="col-md-6 col-sm-12">
 
             <div class="row">
                 <div class="col-xs-12">
@@ -176,25 +198,11 @@
                 </div>
             </form>
         </div>
+
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <ul class="nav nav-tabs">
-                <li class="active">
-                    <a href="#general" data-toggle="tab" aria-expanded="true">General</a>
-                </li>
-                <li>
-                    <a href="#misc" data-toggle="tab" aria-expanded="false">Misc</a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div id="general" class="tab-pane fade active in">
-                    <p>{{ entity.content }}</p>
-                </div>
-                <div id="misc" class="tab-pane">
-                    <p>misc stuff bla bla</p>
-                </div>
-            </div>
+
         </div>
     </div>
 </div>
