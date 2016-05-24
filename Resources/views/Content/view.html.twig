@@ -4,9 +4,34 @@
 
 <div class="container">
     <div class="row">
-        <div class="col-md-12">
-            {{ entity.content }}
-        </div>
+        <h1>{{ entity.pagetitle }}</h1>
+        <p>{{ entity.content }}</p>
+        {% for slot in entity.slots %}
+            <section data-id="{{ slot.id }}">
+
+                <h2 class="sub-title">
+                    {{ slot.title }}
+                </h2>
+
+                <div class="post-content">
+                    {% if slot.embedcode|length > 5 %}
+                        {{ slot.embedcode|raw }}
+                    {% endif %}
+
+                    {% if slot.bodytext|length > 5 %}
+                        {{ slot.bodytext|raw }}
+                    {% endif %}
+
+                    {% if slot.path|length > 5 %}
+                        <img src="{{ asset(slot.path) }}" />
+                    {% endif %}
+
+                </div>
+
+                <div class="clear"></div>
+
+            </section>
+        {% endfor %}
     </div>
 </div>
 
