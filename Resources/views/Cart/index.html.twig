@@ -68,33 +68,60 @@
 
     <div class="row">
         <div class="col-sm-6">
+
+        {% if is_discount_enabled %}
+            <div>
+                <form role="form" method="post" action="{{ path('cart_add_discount') }}">
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th colspan="2">Promo Code</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <input type="text" name="code" class="form-control" />
+                                </td>
+                                <td class="text-center">
+                                    <input type="submit" class="btn btn-primary" value="Submit" name="update_discount" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        {% endif %}
+
         {% if is_shipping_enabled and cartShippingMethods() | length > 0 %}
-            <form role="form" method="post" action="{{ path('cart_shipment_add') }}">
-                <table class="table table-striped table-bordered table-hover">
-                    <thead>
+            <div>
+                <form role="form" method="post" action="{{ path('cart_shipment_add') }}">
+                    <table class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th colspan="2">Shipping Methods</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    {% for method in cartShippingMethods() %}
                         <tr>
-                            <th colspan="2">Shipping Methods</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                {% for method in cartShippingMethods() %}
-                    <tr>
-                        <td class="text-center">
-                            <input type="radio" name="shipping_method" value="{{ method.code }}" {% if cartHasShipmentMethodCode(method.code) %}checked="checked"{% endif %} />
-                        </td>
-                        <td>{{ method.company }} {{ method.method }}  ${{ method.price }}</td>
-                    </tr>
-                {% endfor %}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="2" class="text-right">
-                                <input type="submit" class="btn btn-primary" value="Update" name="update_shipping" />
+                            <td class="text-center">
+                                <input type="radio" name="shipping_method" value="{{ method.code }}" {% if cartHasShipmentMethodCode(method.code) %}checked="checked"{% endif %} />
                             </td>
+                            <td>{{ method.company }} {{ method.method }}  ${{ method.price }}</td>
                         </tr>
-                    </tfoot>
-                </table>
-            </form>
+                    {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2" class="text-right">
+                                    <input type="submit" class="btn btn-primary" value="Update" name="update_shipping" />
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </form>
+            </div>
 
         {% endif %}
         </div>
