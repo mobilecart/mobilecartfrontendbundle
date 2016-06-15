@@ -4,56 +4,20 @@
 
 {% block content %}
 
-{#% if result.searchQuery is defined %}
-    <div><pre>{{ result.searchQuery }}</pre></div>
-{% endif %}
-{% if result.facetQuery is defined %}
-    <div><pre>{{ result.facetQuery }}</pre></div>
-{% endif %#}
-
 <div class="container">
-
-    <div class="row">
-        <div class="col-md-12">
-            <div class="row carousel-holder">
-
-                <div class="col-md-12">
-                    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-                        <ol class="carousel-indicators">
-                            <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
-                            <li data-target="#carousel-example-generic" data-slide-to="1" class=""></li>
-                            <li data-target="#carousel-example-generic" data-slide-to="2" class=""></li>
-                        </ol>
-                        <div class="carousel-inner">
-                            <div class="item active">
-                                <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
-                            </div>
-                            <div class="item">
-                                <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
-                            </div>
-                            <div class="item">
-                                <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
-                            </div>
-                        </div>
-                        <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
-                            <span class="glyphicon glyphicon-chevron-left"></span>
-                        </a>
-                        <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
-                            <span class="glyphicon glyphicon-chevron-right"></span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
     <form id="pager-form" action="{{ path('cart_products') }}">
     <div class="row">
-        <div class="col-sm-12">
+        <div class="col-sm-6">
+            <i class="fa fa-shopping-cart fa-5x pull-left"></i>
+            <h1>Mobile Cart</h1>
+        </div>
+        <div class="col-sm-6">
+            <div>
+                <a href="{{ path('cart_view') }}">Cart</a> | <a href="{{ path('cart_checkout') }}">Checkout</a>
+            </div>
             <div id="scrollable-dropdown-menu" class="input-group">
                 {% if search.query|length > 0 %}
-                <span class="input-group-btn">
+                    <span class="input-group-btn">
                     <button class="btn btn-default search-clear" type="button">
                         <i class="glyphicon glyphicon-remove"></i>
                     </button>
@@ -69,17 +33,54 @@
         </div>
     </div>
 
-    <div class="row sorting pager">
-        <div class="col-sm-9">
-            {% if result.total > 0 %}
-                {% include templatePath('Product:facet-list-horizontal.html.twig') with result %}
-            {% endif %}
+    {% if result.total > 0 %}
+    <div class="row">
+        <div class="col-sm-12">
+            {% include templatePath('Product:facet-list-horizontal.html.twig') with result %}
         </div>
-        <div class="col-sm-3">
+    </div>
+    {% endif %}
 
+    <div class="row carousel-holder">
+        <div class="col-md-12">
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                    <li data-target="#carousel-example-generic" data-slide-to="1" class=""></li>
+                    <li data-target="#carousel-example-generic" data-slide-to="2" class=""></li>
+                </ol>
+                <div class="carousel-inner">
+                    <div class="item active">
+                        <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
+                    </div>
+                    <div class="item">
+                        <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
+                    </div>
+                    <div class="item">
+                        <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
+                    </div>
+                </div>
+                <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                </a>
+                <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <ol class="breadcrumb">
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Library</a></li>
+                <li class="active">Data</li>
+            </ol>
+        </div>
+        <div class="col-sm-6">
             <div>
-
-                <div class="dropdown pull-right">
+                <div class="dropdown pull-right sorting">
                     <button class="btn btn-default dropdown-toggle" type="button" id="sort-by-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                         Sort
                         <span class="caret"></span>
@@ -95,7 +96,6 @@
                         {% endfor %}
                     </ul>
                 </div>
-
 
                 {% if result.facetFilters is defined and result.facetFilters|length > 0 and not isSpaEnabled() %}
                     <div class="dropdown pull-right facet-nav">
@@ -121,7 +121,7 @@
 
             </div>
             <div>
-                <div class="pull-right btn-group input-group" role="group">
+                <div class="pull-right btn-group input-group pager" role="group">
                     <button type="button" class="btn pull-left btn-default prev {% if search.page <= 1 %}disabled{% endif %}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </button>
@@ -133,7 +133,6 @@
             </div>
         </div>
 
-
         <input type="hidden" name="direction" id="sort-dir" value="{{ sortDir() }}" />
         {% for filterCode, filterValue in search.facetFilters %}
             <input type="hidden" name="{{ filterCode }}" value="{{ filterValue }}" />
@@ -144,8 +143,7 @@
     </form>
     {% if result.total > 0 %}
 
-    <div class="row">
-        <div class="col-sm-12 product-list">
+    <div class="row product-list">
 
         {% if result.entities is defined and not isSpaEnabled() %}
             {% for entity in result.entities %}
@@ -182,13 +180,6 @@
                 </div>
             {% endfor %}
         {% endif %}
-
-
-        </div>
-    </div><!-- /row -->
-
-    <div class="row sorting-bottom pager-bottom">
-
     </div>
     {% else %}
 
