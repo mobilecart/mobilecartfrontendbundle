@@ -7,12 +7,12 @@
 <div class="container">
     <form id="pager-form" action="{{ path('cart_products') }}">
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-6 brand-logo">
             <i class="fa fa-shopping-cart fa-5x pull-left"></i>
             <h1>Mobile Cart</h1>
         </div>
-        <div class="col-sm-6">
-            <div>
+        <div class="col-sm-6 search-bar">
+            <div class="search-bar-links">
                 <a href="{{ path('cart_view') }}">Cart</a> | <a href="{{ path('cart_checkout') }}">Checkout</a>
             </div>
             <div id="scrollable-dropdown-menu" class="input-group">

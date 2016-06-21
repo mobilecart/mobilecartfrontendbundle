@@ -8,10 +8,48 @@
 {% block javascripts %}
 {{ parent() }}
 
-    <script src="{{ asset('bundles/mobilecartfrontend/js/product-view.js') }}"></script>
-
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/typeahead.bundle.min.js') }}"></script>
     <script type="text/javascript">
         $(function() {
+
+            var pagerForm = $('#pager-form');
+            var textInput = $('input#text-search');
+
+            // fulltext search-query
+            textInput.keypress(function(e){
+                // todo : auto search
+                if (e.which == 13) {
+                    pagerForm.submit();
+                }
+            });
+
+            var searchURL = "{{ path('cart_products') }}" + "?format=json&q=%QUERY";
+            var engine = new Bloodhound({
+                remote: {
+                    url: searchURL,
+                    wildcard: '%QUERY',
+                    transform: function(response) {
+                        return response.result.entities;
+                    }
+                },
+                identify: function(obj) {
+                    return obj.id;
+                },
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                datumTokenizer: Bloodhound.tokenizers.whitespace
+            });
+
+            $('input.typeahead').typeahead({
+                        minLength: 2,
+                        highlight: true
+                    },
+                    {
+                        name: 'products',
+                        display: 'name',
+                        displayKey: 'name',
+                        source: engine
+                    }
+            );
 
             //initialize add-to-cart button, etc
             //App.views.productView = new App.views.ProductView();
@@ -122,42 +160,24 @@
 {% block content %}
 
 <div class="container">
+
+    <form id="pager-form" action="{{ path('cart_products') }}">
+    {% include templatePath('Shared:header-bar.html.twig') %}
+    </form>
+
     <div class="row">
-
         <div class="col-sm-12">
-
             <img class="slide-image" src="{{ asset(imagePath('product', entity, 'view_jumbo')) }}" alt="" />
-
         </div>
     </div>
     <div class="row">
-
-
-        <div class="col-sm-12 col-md-6">
-
-            <ul class="nav nav-tabs">
-                <li class="active">
-                    <a href="#general" data-toggle="tab" aria-expanded="true">General</a>
-                </li>
-                <li>
-                    <a href="#misc" data-toggle="tab" aria-expanded="false">Misc</a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div id="general" class="tab-pane fade active in">
-                    <p>{{ entity.content }}</p>
-                </div>
-                <div id="misc" class="tab-pane">
-                    <p>misc stuff bla bla</p>
-                </div>
-            </div>
-        </div>
         <div class="col-md-6 col-sm-12">
-
             <div class="row">
-                <div class="col-xs-12">
-                    <h4 class="pull-right">{{ decorate(entity.price) }}</h4>
-                    <h4>{{ entity.name }}</h4>
+                <div class="col-xs-12 col-sm-6">
+                    <h3>{{ entity.name }}</h3>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <h3 class="pull-right">{{ decorate(entity.price) }}</h3>
                 </div>
             </div>
             <form method="post" class="add-to-cart" action="{{ path('cart_add_item', {'id': entity.id}) }}">
@@ -179,30 +199,39 @@
                         </div>
                     {% endfor %}
                 {% endif %}
-                <div class="row">
-                    <div class="col-xs-12">
-                        <label for="qty">Quantity</label>
-                        <input type="number" class="form-control" name="qty" value="1" />
-                    </div>
-                </div>
+
                 <div class="row cart-buttons">
                     <div class="col-xs-12">
                         {% if entity.getIsInStock() %}
-                            <button type="submit" class="btn btn-primary addtocart pull-right"><i class="glyphicon glyphicon-shopping-cart icon-white"> </i>Add to Cart</button>
+                            <button type="submit" class="btn-lg btn-primary addtocart pull-right"><i class="fa fa-shopping-cart"> </i>&nbsp;Add to Cart</button>
                         {% elseif entity.canBackorder() %}
                             <button type="submit" class="btn btn-primary addtocart pull-right">Backorder</button>
                         {% else %}
                             <p>Currently Unavailable</p>
                         {% endif %}
+                        <input type="hidden" name="qty" value="1" />
                     </div>
                 </div>
             </form>
         </div>
+        <div class="col-sm-12 col-md-6 product-tabs">
 
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
-
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#general" data-toggle="tab" aria-expanded="true">General</a>
+                </li>
+                <li>
+                    <a href="#misc" data-toggle="tab" aria-expanded="false">Misc</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="general" class="tab-pane fade active in">
+                    <p>{{ entity.content }}</p>
+                </div>
+                <div id="misc" class="tab-pane">
+                    <p>misc stuff bla bla</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>

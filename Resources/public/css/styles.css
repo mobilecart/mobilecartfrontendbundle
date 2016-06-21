@@ -239,8 +239,41 @@ div.cart-dropdown {
     padding: 10px;
 }
 
+div.cart-buttons {
+    padding: 5px 0;
+}
+
+div.facet-nav {
+    padding: 10px 5px 0 0;
+    margin-bottom: 5px;
+}
+
 input#page {
     width: 60px;
+}
+
+input[type="number"] {
+    width: 60px;
+}
+
+div.product-tabs {
+    margin-top: 5px;
+}
+
+div.product-tabs div.tab-pane {
+    padding: 3px;
+}
+
+div.brand-logo {
+    padding: 5px 10px;
+}
+
+div.search-bar {
+    padding: 5px 10px;
+}
+
+div.search-bar-links {
+    padding: 3px;
 }
 
 div.img-circle {
