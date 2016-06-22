@@ -37,6 +37,28 @@
     <div class="row">
         <div class="col-sm-12">
             {% include templatePath('Product:facet-list-horizontal.html.twig') with result %}
+
+            {% if result.facetFilters is defined and result.facetFilters|length > 0 and not isSpaEnabled() %}
+                <div class="dropdown pull-right facet-nav">
+                    <button class="btn btn-default dropdown-toggle" type="button" id="facet-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        Active
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="facet-0">
+                        {% for facet in result.facetFilters %}
+                            <li class="navbar-dropdown">
+                                {% if facet.remove_url is defined and facet.remove_url|length > 0 %}
+                                    <a href="{{ facet.remove_url }}">
+                                        <i class="fa fa-times"></i>
+                                        {{ facet.label }} : {{ facet.term|humanize }}
+                                        {% if facet.count > 0 %} <span class="badge pull-right">{{ facet.count }}</span>{% endif %}
+                                    </a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
         </div>
     </div>
     {% endif %}
@@ -79,58 +101,35 @@
             </ol>
         </div>
         <div class="col-sm-6">
-            <div>
-                <div class="dropdown pull-right sorting">
-                    <button class="btn btn-default dropdown-toggle" type="button" id="sort-by-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                        Sort
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="sort-by-dropdown">
-                        {% for sortable in sortable('product') %}
+
+            <div class="pull-right btn-group input-group pager" role="group">
+                <button class="btn pull-left btn-default dropdown-toggle" type="button" id="sort-by-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Sort
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="sort-by-dropdown">
+                    {% for sortable in sortable('product') %}
                         <li class="navbar-dropdown">
                             <a href="#" class="sort-by-input">
                                 <input type="radio" name="sort" data-dir="{{ sortable.dir }}" class="sort-by" value="{{ sortable.value }}" {% if sortable.active %} checked="checked"{% endif %} />
                                 {{ sortable.label }}
                             </a>
                         </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+                    {% endfor %}
+                </ul>
+                <button type="button" class="btn pull-left btn-default prev {% if search.page <= 1 %}disabled{% endif %}" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </button>
+                <input type="number" id="page" class="form-control number" name="{{ search.pageParam }}" value="{{ search.page }}" />
+                <button type="button" class="btn pull-right btn-default next {% if search.page >= result.pages %}disabled{% endif %}" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </button>
+            </div>
 
-                {% if result.facetFilters is defined and result.facetFilters|length > 0 and not isSpaEnabled() %}
-                    <div class="dropdown pull-right facet-nav">
-                        <button class="btn btn-default dropdown-toggle" type="button" id="facet-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                            Active
-                            <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="facet-0">
-                            {% for facet in result.facetFilters %}
-                                <li class="navbar-dropdown">
-                                    {% if facet.remove_url is defined and facet.remove_url|length > 0 %}
-                                        <a href="{{ facet.remove_url }}">
-                                            <i class="fa fa-times"></i>
-                                            {{ facet.label }} : {{ facet.term|humanize }}
-                                            {% if facet.count > 0 %} <span class="badge pull-right">{{ facet.count }}</span>{% endif %}
-                                        </a>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
+            <div class="dropdown pull-right sorting">
 
             </div>
-            <div>
-                <div class="pull-right btn-group input-group pager" role="group">
-                    <button type="button" class="btn pull-left btn-default prev {% if search.page <= 1 %}disabled{% endif %}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </button>
-                    <input type="number" id="page" class="form-control number" name="{{ search.pageParam }}" value="{{ search.page }}" />
-                    <button type="button" class="btn pull-right btn-default next {% if search.page >= result.pages %}disabled{% endif %}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </button>
-                </div>
-            </div>
+
         </div>
 
         <input type="hidden" name="direction" id="sort-dir" value="{{ sortDir() }}" />
