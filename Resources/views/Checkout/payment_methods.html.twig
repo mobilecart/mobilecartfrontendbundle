@@ -1,6 +1,7 @@
 {% form_theme form 'bootstrap_3_layout.html.twig' %}
 
 <div class="payment-option row">
+    {% if payment_methods|length > 1 %}
     <div class="col-sm-2 payment-option-selector">
         {% set i = 0 %}
         {% for method in payment_methods %}
@@ -12,6 +13,9 @@
         {% endfor %}
     </div>
     <div class="col-sm-10">
+    {% else %}
+    <div class="col-xs-12">
+    {% endif %}
 
         {% set i = 0 %}
         {% for method in payment_methods %}
@@ -22,4 +26,9 @@
             </div>
         {% endfor %}
     </div>
+    {% if payment_methods|length == 1 %}
+        {% for method in payment_methods %}
+            <input type="hidden" class="hide payment-option-input payment-{{ method.code }}" data-code="{{ method.code }}" name="payment_method" value="{{ method.code }}" />
+        {% endfor %}
+    {% endif %}
 </div>
