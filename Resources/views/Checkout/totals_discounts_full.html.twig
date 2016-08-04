@@ -1,0 +1,278 @@
+{% extends frontend() %}
+
+{% block topnav %}
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+
+        </div>
+    </nav>
+{% endblock %}
+{#
+
+Each Area has its own update call, which refreshes the totals
+The Next button simply goes to the payment screen
+
+#}
+{% block content %}
+<div id="section-{{ section }}">
+<div class="container totals-discounts-container">
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading section-heading" role="tab" id="heading-{{ section }}">
+                <div class="row">
+                    <div class="col-xs-1">
+                        <div class="img-circle pull-left">{{ step_number }}</div>
+                    </div>
+                    <div class="col-xs-5">
+                        <h2>
+                            Totals and Discounts
+                        </h2>
+                    </div>
+                    <div class="col-xs-6 text-right">
+
+                    </div>
+                </div>
+            </div>
+            <div class="panel-collapse collapse in section-body" role="tabpanel" aria-labelledby="heading-{{ section }}">
+                <div class="panel-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-12 form-group">
+                                <table class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Sku</th>
+                                            <th>Price</th>
+                                            <th>Qty</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for cart_item in cart.items %}
+                                        <tr>
+                                            <td>{{ cart_item.name }}</td>
+                                            <td>{{ cart_item.sku }}</td>
+                                            <td>{{ decorate(cart_item.price) }}</td>
+                                            <td><input class="form-control qty-input" type="number" name="qty[{{ cart_item.product_id }}]" value="{{ cart_item.qty }}" /></td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+
+                            {% if is_shipping_enabled and cartShippingMethods() | length > 0 %}
+                                <table class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Shipping Methods</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for method in cartShippingMethods() %}
+                                        <tr>
+                                            <td class="text-center">
+                                                <input type="radio" name="shipping_method" value="{{ method.code }}" {% if cartHasShipmentMethodCode(method.code) %}checked="checked"{% endif %} />
+                                            </td>
+                                            <td>{{ method.company }} {{ method.method }}  {{ decorate(method.price) }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% endif %}
+
+                                <div>
+                                    <label>Promo Code</label>
+                                    <input name="discount_code[]" class="form-control" value="" />
+                                </div>
+                                <div class="text-right">
+                                    <button class="btn btn-default">Update</button>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 totals-container">
+                                <table class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th colspan="2">Totals <i class="spinner fa fa-spinner fa-spin fa-fw margin-bottom" style="display:none;"></i>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for total in cart.totals %}
+                                        <tr>
+                                            <th>{{ total.label }}</th>
+                                            <th>{{ decorate(total.value) }}</th>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-4">
+
+        </div>
+        <div class="col-xs-4">
+            <a role="button" data-section="{{ section }}" class="btn btn-success form-control next-button">Next</a>
+            <div class="text-center spinner" style="display:none;">
+                <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+            </div>
+        </div>
+        <div class="col-xs-4">
+
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}
+{% block javascripts %}
+
+    {{ parent() }}
+
+    <script type="text/javascript">
+
+        var CartWidget = function(obj) {
+            this.containerEl = obj.containerEl;
+            this.url = obj.url;
+            this.attachEvents();
+            return this;
+        };
+
+        CartWidget.prototype = {
+            containerEl: {},
+            url: '',
+            attachEvents: function() {
+                var self = this;
+
+                // Note : need to assume here that the elements are constantly being re-populated with ajax html responses
+
+                // change qty on a cart item
+                // change shipping method
+                // change promo code, update
+
+                self.containerEl.on('change', 'input[name="shipping_method"]', function(){
+
+                    self.containerEl.find('div.totals-container .spinner').show();
+
+                    var code = $(this).val();
+
+                    var values = {
+                        shipping_method: code
+                    };
+
+                    var updateUrl = '{{ path('cart_shipment_add') }}' + '?format=json';
+
+                    $.ajax({
+                        url: updateUrl,
+                        method: 'POST',
+                        dataType: 'json',
+                        data: values
+                    }).done(function(){
+                        self.render();
+                    });
+                });
+
+                self.containerEl.on('change', 'input.qty-input', function(){
+
+                    // first gather all qty inputs, and their values
+
+                    self.containerEl.find('div.totals-container .spinner').show();
+
+                    var values = {};
+                    self.containerEl.find('input.qty-input').each(function(){
+                        var qtyInput = $(this);
+                        var key = qtyInput.attr('name');
+                        var value = qtyInput.val();
+                        values[key] = value;
+                    });
+
+                    // update qtys
+
+                    var updateUrl = '{{ path('cart_update_qtys') }}' + '?format=json';
+
+                    $.ajax({
+                        url: updateUrl,
+                        method: 'POST',
+                        dataType: 'json',
+                        data: values
+                    }).done(function(){
+                        self.render();
+                    });
+                });
+
+            },
+            render: function() {
+                var self = this;
+                $.ajax({
+                    url: self.url
+                }).done(function(html){
+                    self.containerEl.find('.panel-body').html(html);
+                });
+
+                return self;
+            }
+        };
+
+    </script>
+
+    <script type="text/javascript">
+        $(function(){
+
+            var containerEl = $('div#section-totals_discounts');
+            var url = '{{ path('cart_checkout_totals_discounts') }}?reload=1';
+            var cartWidget = new CartWidget({
+                containerEl: containerEl,
+                url: url
+            });
+
+            $('.next-button').click(function(e){
+                var self = $(this);
+                self.hide();
+                self.siblings('.spinner').show();
+
+                containerEl.find('.has-error').removeClass('has-error');
+                var postData = {};
+
+                containerEl.find('input, select, textarea').each(function(e){
+                    var input = $(this);
+                    var name = input.attr('name');
+                    postData[name] = input.val();
+                });
+
+                // send request
+                $.ajax({
+                    url: "{{ path('cart_checkout_update_totals_discounts') }}",
+                    dataType: 'json',
+                    type: 'POST',
+                    data: postData
+                }).error(function(jqxhr, status, errorThrown){
+
+                    self.show();
+                    self.siblings('.spinner').hide();
+
+                }).done(function(response){
+
+                    self.show();
+                    self.siblings('.spinner').hide();
+
+                    //console.log(response);
+
+                    if (typeof(response['success']) != 'undefined' && response.success == 1) {
+                        // show next section
+                        window.location = response.redirect_url;
+                    }
+                });
+            });
+        });
+    </script>
+
+{% endblock %}

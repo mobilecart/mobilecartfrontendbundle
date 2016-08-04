@@ -1,0 +1,183 @@
+{% extends frontend() %}
+
+{% block topnav %}
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+
+        </div>
+    </nav>
+{% endblock %}
+{% block content %}
+<div id="section-{{ section }}">
+    <div class="container">
+        <div class="row">
+            <div class="panel panel-default">
+                <div class="panel-heading section-heading" role="tab" id="heading-{{ section }}">
+                    <div class="row">
+                        <div class="col-xs-1">
+                            <div class="img-circle pull-left">{{ step_number }}</div>
+                        </div>
+                        <div class="col-xs-5">
+                            <h2>
+                                Payment
+                            </h2>
+                        </div>
+                        <div class="col-xs-6 text-right">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-collapse collapse in section-body" role="tabpanel" aria-labelledby="heading-{{ section }}">
+                    <div class="panel-body">
+                        <div class="container">
+
+                            <div class="payment-option row">
+                                {% if payment_methods|length > 1 %}
+                                <div class="col-sm-2 payment-option-selector">
+                                    {% set i = 0 %}
+                                    {% for method in payment_methods %}
+                                        <div>
+                                            <input type="radio" class="payment-option-input payment-{{ method.code }}" data-code="{{ method.code }}" name="payment_method" value="{{ method.code }}" {% if i == 0 %} checked="checked" {% endif %}/>
+                                            <label>{{ method.label }}</label>
+                                        </div>
+                                        {% set i = i + 1 %}
+                                    {% endfor %}
+                                </div>
+                                <div class="col-sm-10">
+                                {% else %}
+                                <div class="col-xs-12">
+                                {% endif %}
+
+                                    {% set i = 0 %}
+                                    {% for method in payment_methods %}
+                                        <div class="payment-option-form payment-{{ method.code }}" id="payment-{{ method.code }}" data-code="{{ method.code }}"{% if i > 0 %} style="display: none;"{% endif %}>
+                                        {# dont break main form with more form tags, markup #}
+                                        {{ form_widget(method.getForm()) }}
+                                        {% set i = i + 1 %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if payment_methods|length == 1 %}
+                                    {% for method in payment_methods %}
+                                        <input type="hidden" class="hide payment-option-input payment-{{ method.code }}" data-code="{{ method.code }}" name="payment_method" value="{{ method.code }}" />
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-4">
+
+            </div>
+            <div class="col-xs-4">
+                <a role="button" data-section="{{ section }}" data-next-section="" class="btn btn-success form-control next-button final-step">Next</a>
+                <div class="text-center spinner" style="display:none;">
+                    <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+                </div>
+            </div>
+            <div class="col-xs-4">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="confirm-order-modal" tabindex="-1" role="dialog" aria-labelledby="confirm-modal-label">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="confirm-modal-label">Confirm Order</h4>
+                </div>
+                <div class="modal-body"> </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-xs-4">
+                            <button class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                        </div>
+                        <div class="col-xs-4">
+                            <button class="btn btn-success submit-order form-control">Submit Order</button>
+                            <div class="text-center spinner" style="display:none;">
+                                <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+                            </div>
+                        </div>
+                        <div class="col-xs-4">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+
+    {{ parent() }}
+
+    <script type="text/javascript">
+
+        $(function() {
+
+            // handle radio inputs; show and hide sub-forms
+            $('input.payment-option-input').click(function() {
+                var self = $(this);
+                var code = self.attr('data-code');
+                $('div.payment-option-form').hide();
+                $('div.payment-option-form.payment-' + code).show();
+            });
+
+        });
+
+    </script>
+
+    <script src="{{ asset(frontendAsset('js/checkout-widget.js')) }}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+        var container = $('#co-accordion');
+        var checkoutSections = {{ widget_sections|json_encode|raw }};
+        var formName = '{{ form_name }}';
+        var totalsDiscountsUrl = '';
+        var totalsDiscountsSection = '';
+        var confirmOrderUrl = '{{ confirm_order_url }}';
+        var confirmOrderModal = $('#confirm-order-modal');
+        var submitOrderUrl = '{{ submit_order_url }}';
+
+        var checkout = new CheckoutWidget({
+            container: container,
+            sections: checkoutSections,
+            formName: formName,
+            totalsDiscountsUrl: totalsDiscountsUrl,
+            totalsDiscountsSection: totalsDiscountsSection,
+            confirmOrderUrl: confirmOrderUrl,
+            confirmOrderModal: confirmOrderModal,
+            submitOrderUrl: submitOrderUrl
+        });
+
+    </script>
+
+    {% for section, sectionData in sections %}
+        {% if sectionData.js_template is defined %}
+            {% include sectionData.js_template with sectionData %}
+        {% endif %}
+    {% endfor %}
+
+    {% for javascript in javascripts %}
+    {% if javascript.url is defined %}
+    <script type="text/javascript" src="{{ javascript.url }}"></script>
+    {% elseif javascript.asset is defined %}
+    <script src="{{ asset(javascript.asset) }}" type="text/javascript"></script>
+    {% elseif javascript.js_template is defined and javascript.data is defined %}
+        {% include javascript.js_template with javascript.data %}
+    {% elseif javascript.js_template is defined %}
+        {% include javascript.js_template %}
+    {% endif %}
+    {% endfor %}
+
+
+{% endblock %}

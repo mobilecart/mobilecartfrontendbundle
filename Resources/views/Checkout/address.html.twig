@@ -1,0 +1,166 @@
+{% extends frontend() %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+
+{% block topnav %}
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+
+        </div>
+    </nav>
+{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading section-heading" role="tab" id="heading-{{ section }}">
+                <div class="row">
+                    <div class="col-xs-1">
+                        <div class="img-circle pull-left">{{ step_number }}</div>
+                    </div>
+                    <div class="col-xs-5">
+                        {% if sections[section] is defined %}
+                        <h2>
+                            {{ sections[section].label }}
+                        </h2>
+                        {% endif %}
+                    </div>
+                    <div class="col-xs-6 text-right">
+
+                    </div>
+                </div>
+            </div>
+            <div id="section-{{ section }}" class="panel-collapse collapse in section-body" role="tabpanel" aria-labelledby="heading-{{ section }}">
+                <div class="panel-body">
+
+                    {% if sections[section].fields is defined %}
+                        <form method="post" class="checkout-form" action="{{ sections[section].post_url }}">
+                        {% for field in sections[section].fields %}
+                            {# assuming this is a sub-form #}
+                            {{ form_row(form.offsetGet(field)) }}
+                        {% endfor %}
+                        </form>
+                    {% elseif template is defined %}
+                        {% include template with sectionData %}
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-xs-4">
+
+                        </div>
+                        <div class="col-xs-4">
+                            <a role="button" data-section="{{ section }}" class="btn btn-success form-control next-button {% if final_step is defined %}final-step{% endif %}">Next</a>
+                            <div class="text-center spinner" style="display:none;">
+                                <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+                            </div>
+                        </div>
+                        <div class="col-xs-4">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+
+<script src="{{ asset(frontendAsset('js/country-region-widget.js')) }}" type="text/javascript"></script>
+
+{% if sections[section] is defined %}
+<script type="text/javascript">
+    $(function(){
+
+        var countryRegions = {{ country_regions|json_encode|raw }};
+        var countryRegionWidget = new CountryRegionWidget({
+            countryRegions: countryRegions
+        });
+        var form = $('form.checkout-form');
+
+        var fields = {{ sections[section].fields|json_encode|raw }};
+        var sectionKey = "{{ section }}";
+
+        $('.next-button').click(function(e){
+            var self = $(this);
+            self.hide();
+            self.siblings('.spinner').show();
+
+            form.find('.has-error').removeClass('has-error');
+            var postData = {};
+
+            if (fields.length > 0) {
+
+                for (var x = 0; x < fields.length; x++) {
+                    var field = fields[x];
+                    var inputId = sectionKey + '_' + field;
+                    var input = $('#' + inputId);
+                    postData[field] = input.val();
+                }
+            } else {
+
+                form.find('input, select, textarea').each(function(e){
+                    var input = $(this);
+                    var name = input.attr('name');
+                    postData[name] = input.val();
+                });
+            }
+
+            // send request
+            $.ajax({
+                url: "{{ sections[section].post_url }}",
+                dataType: 'json',
+                type: 'POST',
+                data: postData
+            }).error(function(jqxhr, status, errorThrown){
+
+                self.show();
+                self.siblings('.spinner').hide();
+
+            }).done(function(response){
+
+                self.show();
+                self.siblings('.spinner').hide();
+
+                //console.log(response);
+
+                if (typeof(response['success']) != 'undefined' && response.success == 1) {
+                    // show next section
+                    window.location = response.redirect_url;
+                } else {
+
+                    var invalid = {};
+                    var errors = [];
+                    if (typeof response['invalid'] != 'undefined') {
+                        invalid = response.invalid;
+                    }
+
+                    if (typeof response['errors'] != 'undefined') {
+                        errors = response.errors;
+                    }
+
+                    for (field in invalid) {
+                        var message = invalid[field];
+                        var inputId = sectionKey + '_' + field;
+                        var inputEl = $('#' + inputId);
+                        inputEl.parent().addClass('has-error');
+                    }
+
+                    if (errors.length > 0) {
+                        for (var x = 0; x < errors.length; x++) {
+                            // todo : display error
+                        }
+                    }
+                }
+
+            });
+        });
+    });
+
+</script>
+{% endif %}
+{% endblock %}

@@ -19,7 +19,7 @@
 
         {% set i = 0 %}
         {% for method in payment_methods %}
-            <div class="payment-option-form payment-{{ method.code }}" id="payment-{{ method.code }}" data-code="{{ method.code }}"{% if i > 0 %} style="display: none;"{% endif %}">
+            <div class="payment-option-form payment-{{ method.code }}" id="payment-{{ method.code }}" data-code="{{ method.code }}"{% if i > 0 %} style="display: none;"{% endif %}>
             {# dont break main form with more form tags, markup #}
             {{ form_widget(method.getForm()) }}
             {% set i = i + 1 %}
