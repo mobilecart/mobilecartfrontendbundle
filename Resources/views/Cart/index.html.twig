@@ -18,7 +18,6 @@
 {% block content %}
 
 <div class="container">
-    {% if cartItems()|length > 0 %}
     <div class="row">
         <div class="col-xs-12 form-group">
             <h1>Shopping Cart</h1>
@@ -34,7 +33,8 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for item in cartItems() %}
+                    {% if cartItems()|length > 0 %}
+                        {% for item in cartItems() %}
                         <tr>
                             <td>
                                 {% if item.parent_options|length > 0 %}
@@ -52,7 +52,7 @@
                                 </a>
                             </td>
                         </tr>
-                    {% endfor %}
+                        {% endfor %}
                     </tbody>
                     <tfoot>
                         <tr>
@@ -61,11 +61,19 @@
                             </td>
                         </tr>
                     </tfoot>
+                    {% else %}
+                    <tbody>
+                        <tr>
+                            <td colspan="5" align="center">Your Cart is Empty. <a href="{{ path('cart_products') }}">Click here to see Products</a></td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
                 </table>
             </form>
         </div>
     </div>
 
+    {% if cartItems()|length > 0 %}
     <div class="row">
         <div class="col-sm-6">
 
@@ -144,14 +152,6 @@
             <div class="text-right">
                 <a class="btn btn-success btn-lg" href="{{ path('cart_checkout') }}">Proceed to Checkout</a>
             </div>
-        </div>
-    </div>
-
-    {% else %}
-    <div class="row">
-        <div class="col-xs-12">
-            <h1>Shopping Cart</h1>
-            <p>Your Shopping Cart is Empty ?!</p>
         </div>
     </div>
     {% endif %}
