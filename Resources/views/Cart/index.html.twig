@@ -116,7 +116,7 @@
                             <td class="text-center">
                                 <input type="radio" name="shipping_method" value="{{ method.code }}" {% if cartHasShipmentMethodCode(method.code) %}checked="checked"{% endif %} />
                             </td>
-                            <td>{{ method.company }} {{ method.method }}  ${{ method.price }}</td>
+                            <td>{{ method.company }} {{ method.method }}  {{ decorate(method.price) }}</td>
                         </tr>
                     {% endfor %}
                         </tbody>
