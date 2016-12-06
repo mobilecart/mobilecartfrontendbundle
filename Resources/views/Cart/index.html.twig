@@ -3,6 +3,8 @@
 {% block javascripts %}
     {{ parent() }}
 
+
+    {% if isSpaEnabled() %}
     <!--
     <script src="{{ asset('bundles/mobilecartfrontend/js/cart.js') }}"></script>
     <script type="text/javascript">
@@ -13,6 +15,8 @@
         });
     </script>
     -->
+    {% endif %}
+
 {% endblock %}
 
 {% block content %}
@@ -38,9 +42,13 @@
                         <tr>
                             <td>
                                 {% if item.parent_options|length > 0 %}
-                                <a href="{{ path('cart_product_view', { 'slug': item.parent_options.slug }) }}">{{ item.name }}</a>
+                                <a href="{{ path('cart_product_view', { 'slug': item.parent_options.slug }) }}">
+                                    <img class="img-responsive" src="{{ asset(imagePath('product', item, 'cart_row')) }}" alt="{{ item.name }}" />
+                                </a>
                                 {% else %}
-                                <a href="{{ path('cart_product_view', { 'slug': item.slug }) }}">{{ item.name }}</a>
+                                <a href="{{ path('cart_product_view', { 'slug': item.slug }) }}">
+                                    <img class="img-responsive" src="{{ asset(imagePath('product', item, 'cart_row')) }}" alt="{{ item.name }}" />
+                                </a>
                                 {% endif %}
                             </td>
                             <td>{{ item.sku }}</td>
@@ -156,11 +164,13 @@
     </div>
     {% endif %}
 
-    {#<div class="row">
+    {#
+    <div class="row">
         <pre>
             {{ cartJson() }}
         </pre>
-    </div>#}
+    </div>
+    #}
 
 </div>
 {% endblock %}

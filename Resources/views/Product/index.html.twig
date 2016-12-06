@@ -37,7 +37,6 @@
     <div class="row">
         <div class="col-sm-12">
             {% include templatePath('Product:facet-list-horizontal.html.twig') with result %}
-
             {% if result.facetFilters is defined and result.facetFilters|length > 0 and not isSpaEnabled() %}
                 <div class="dropdown pull-right facet-nav">
                     <button class="btn btn-default dropdown-toggle" type="button" id="facet-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -140,6 +139,11 @@
     </div>
 
     </form>
+
+    {% if custom_template_html is defined and custom_template_html|length > 1 %}
+        {{ custom_template_html|raw }}
+    {% endif %}
+
     {% if result.total > 0 %}
 
     <div class="row product-list">
@@ -198,6 +202,128 @@
     {{ parent() }}
 
     {% if isSpaEnabled() %}
+
+    <script src="{{ asset('bundles/mobilecartfrontend/js/backbone-min.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartfrontend/js/backbone.localStorage.js') }}"></script>
+    <script src="{{ asset('bundles/mobilecartfrontend/js/backbone.paginator.min.js') }}"></script>
+
+    <script type="text/html" id="paginationTemplate">
+        <% if (currentPage != 1) { %>
+        <button class="prev btn-default btn">Prev</button>
+        <% } %>
+        <div class="btn-group">
+            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Page <%= currentPage %> <span class="caret"></span></button>
+            <ul class="dropdown-menu">
+                <% for(p=1;p<=totalPages;p++){ %>
+                <% if (currentPage == p) { %>
+                <li class="active"><a href="#" class="page"><%= p %></a></li>
+                <% } else { %>
+                <li><a href="#" class="page"><%= p %></a></li>
+                <% } %>
+                <% }%>
+            </ul>
+        </div>
+        <% if (lastPage != currentPage && lastPage != 0) { %>
+        <button class="btn btn-default next">Next</button>
+        <% } %>
+    </script>
+
+    <script type="text/html" id="sortingTemplate">
+        <div class="btn-group">
+            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Sort by <strong><span id="sortByText">popularity</span></strong> <span class="caret"></span></button>
+            <ul class="dropdown-menu sort-by">
+                <li><a href="date">Date</a></li>
+                <li><a href="name">Name</a></li>
+                <li><a href="popularity">Popularity</a></li>
+            </ul>
+        </div>
+    </script>
+
+    <script type="text/template" id="facetLabel">
+        <a href="#" class="facet-label"><%- label %><i class="fa fa-arrow"></i></a>
+    </script>
+
+    <script type="text/template" id="active-facet-link">
+        <% if (typeof(remove_url) != "undefined" && remove_url.length > 0) { %>
+        <a href="<%- remove_url %>" class="facet-remove-link">
+            <i class="fa fa-times"></i>
+            <%- label %> : <%- term %>
+            <span class="badge pull-right"><%- count %></span>
+        </a>
+        <% } %>
+    </script>
+
+    <script type="text/template" id="facetLink">
+        <% if (typeof(remove_url) != "undefined" && remove_url.length > 0) { %>
+        <a href="<%- remove_url %>" class="facet-remove-link">
+            <i class="fa fa-times"></i>
+            <%- term %>
+            <span class="badge pull-right"><%- count %></span>
+        </a>
+        <% } else { %>
+        <a href="<%- url %>" class="facet-link"><%- term %>
+            <span class="badge pull-right"><%- count %></span>
+        </a>
+        <% } %>
+    </script>
+
+    <script type="text/template" id="cart-total">
+        <div class="row">
+            <div class="col-xs-6"><%- label %></div>
+            <div class="col-xs-6"><%- value %></div>
+        </div>
+    </script>
+
+    <!-- todo: pass url as parameter -->
+    <script type="text/template" id="cart-item">
+        <div class="row">
+            <div class="col-xs-8">
+                <a href="/<%- slug %>"><%- name %></a>
+            </div>
+            <div class="col-xs-4"><%- qty %> x <%- price %></div>
+        </div>
+    </script>
+
+    <script type="text/template" id="cart-buttons">
+        <div class="row">
+            <div class="col-xs-6">
+                <a class="btn btn-default" href="/cart/view">View Cart</a>
+            </div>
+            <div class="col-xs-6">
+                <a class="btn btn-success" href="/cart/checkout">Checkout</a>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="product-grid-single">
+
+        <div class="thumbnail">
+            <a href="/<%- slug %>"><img alt="" src="/bundles/mobilecartfrontend/images/320x150.gif"></a>
+            <div class="caption">
+                <h4><a href="/<%- slug %>"><%- name %></a></h4>
+                <h4>$<%- price %></h4>
+                <p></p>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-6">
+                    <div class="ratings">
+                        <p>15 Reviews<br>
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                            <span class="glyphicon glyphicon-star"></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="col-xs-6">
+                    <a href="/cart/add/<%- id %>" rel="nofollow" class="btn btn-primary addtocart">Add to Cart</a>
+                </div>
+            </div>
+        </div>
+
+    </script>
 
     <script src="{{ asset('bundles/mobilecartfrontend/js/spin.min.js') }}"></script>
     <script src="{{ asset('bundles/mobilecartfrontend/js/cart.js') }}"></script>

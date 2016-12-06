@@ -1,6 +1,6 @@
 {% extends frontend() %}
 
-{% block content_wrapper %}
+{% block alerts %}
 
 <div class="container">
     <div class="row alerts">
@@ -12,6 +12,7 @@
     {% endif %}
     </div>
 </div>
+{% endblock %}
 
 {% block content %}
 
@@ -51,7 +52,6 @@
     </div>
 </div>
 
-{% endblock %}
 {% endblock %}
 
 {% block stylesheets %}

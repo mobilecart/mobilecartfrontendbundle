@@ -1,0 +1,49 @@
+{% extends templatePath('Shared:edit.html.twig', 'frontend') %}
+{% block header_text %}Edit Customer Address{% endblock %}
+{% block back_link %}
+    <a href="{{ renderGridBackUrl('customer_addresses') }}" class="btn btn-default">Back</a>
+{% endblock %}
+
+{% block sidebar %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3">
+            <nav role="navigation" class="navbar-default navbar-static-side ">
+                <div class="sidebar-collapse">
+                    <ul class="side-menu nav">
+                        {% for nav in navigation %}
+                            <li>
+                                <a href="{{ nav.url }}">{{ nav.label }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </nav>
+        </div>
+
+{% endblock %}
+
+{% block content_wrapper %}
+        <div class="col-sm-9">
+    {% block content %}
+        {{ parent() }}
+    {% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+
+    {{ parent() }}
+
+    <script src="{{ asset('bundles/mobilecartadmin/js/country-region-widget.js') }}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var countryRegions = {{ country_regions|json_encode|raw }};
+        var countryRegionWidget = new CountryRegionWidget({
+            countryRegions: countryRegions
+        });
+    </script>
+
+{% endblock %}
