@@ -1,0 +1,94 @@
+{% extends frontend() %}
+{% form_theme form 'bootstrap_3_layout.html.twig' %}
+{% block sidebar %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-3">
+            <nav role="navigation" class="navbar-default navbar-static-side ">
+                <div class="sidebar-collapse">
+                    <ul class="side-menu nav">
+                        {% for nav in navigation %}
+                        <li>
+                            <a href="{{ nav.url }}">{{ nav.label }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </nav>
+        </div>
+{% endblock %}
+{% block content %}
+        <div class="col-sm-9">
+
+            {{ form_start(form) }}
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h2 class="panel-title">Customer Account</h2>
+                </div>
+                <div class="panel-body">
+                    <ul class="nav nav-tabs">
+                        {% if form_sections is defined %}
+                            {% for section, sectionData in form_sections %}
+                                <li class="{% if section == 'general' %}active{% endif %}">
+                                    <a href="#section-{{ section }}" data-toggle="tab" aria-expanded="{% if section == 'general' %}true{% else %}false{% endif %}">{{ sectionData.label }}</a>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
+                        {% for section, sectionData in template_sections %}
+                            <li {% if sectionData.active is defined %}class="active"{% endif %}>
+                                <a href="#{{ sectionData.section_id }}" data-toggle="tab" aria-expanded="{% if sectionData.active is defined %}true{% else %}false{% endif %}">{{ sectionData.label }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <div class="tab-content">
+                        {% if form_sections is defined %}
+                            {% for section, sectionData in form_sections %}
+                                <div id="section-{{ section }}" class="tab-pane fade{% if section == 'general' %} active in{% endif %}">
+                                    <div class="panel panel-default tab-panel">
+                                        <div class="panel-body">
+                                            {% for field in sectionData.fields %}
+                                                {{ form_row(form.offsetGet(field)) }}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        {% for section, sectionData in template_sections %}
+                            <div id="{{ sectionData.section_id }}" class="tab-pane fade{% if sectionData.active is defined %} active in{% endif %}">
+                                <div class="panel panel-default tab-panel">
+                                    <div class="panel-body">
+                                        {% include sectionData.template with sectionData %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <input type="submit" class="btn btn-success pull-right" value="Save">
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+
+    {{ parent() }}
+
+    <script src="{{ asset('bundles/mobilecartfrontend/js/country-region-widget.js') }}" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        var countryRegions = {{ country_regions|json_encode|raw }};
+        var countryRegionWidget = new CountryRegionWidget({
+            countryRegions: countryRegions
+        });
+    </script>
+
+{% endblock %}
