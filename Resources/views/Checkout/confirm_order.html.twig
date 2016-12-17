@@ -28,17 +28,19 @@
     <div class="row">
         <div class="col-sm-6">
 
-        {% if is_shipping_enabled and cartShipment() %}
+        {% if is_shipping_enabled and cartShipments()|length > 0 %}
             <table class="table table-striped table-bordered table-hover">
                 <thead>
                     <tr>
-                        <th>Shipping Method</th>
+                        <th>Shipments</th>
                     </tr>
                 </thead>
                 <tbody>
+                {% for shipment in cartShipments() %}
                     <tr>
-                        <td>{{ cartShipment().company }} {{ cartShipment().method }}  {{ decorate(cartShipment().price) }}</td>
+                        <td>{{ shipment.company }} {{ shipment.method }}  {{ decorate(shipment.price) }}</td>
                     </tr>
+                {% endfor %}
                 </tbody>
             </table>
         {% endif %}

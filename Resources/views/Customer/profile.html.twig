@@ -46,4 +46,25 @@
         });
     </script>
 
+    <script type="text/javascript">
+        $(function(){
+
+            $('input#customer_profile_is_shipping_same').on('change', function(){
+                var chkbox = $(this);
+                if (chkbox.is(':checked')) {
+                    $('.billing-input').each(function(){
+                        var input = $(this);
+                        var id = input.attr('id');
+                        var shippingId = id.replace('billing', 'shipping');
+                        var shippingEl = $('#' + shippingId);
+                        if (shippingEl) {
+                            shippingEl.val(input.val());
+                        }
+                    });
+                }
+            });
+
+        });
+    </script>
+
 {% endblock %}

@@ -57,11 +57,11 @@
                             <td>{{ item.sku }}</td>
                             <td>{{ decorate(item.price) }}</td>
                             <td><input class="form-control" type="number" name="qty[{{ item.product_id }}]" value="{{ item.qty }}" /></td>
-                            {% if is_multi_shipping_enabled and addresses|length > 1 %}
+                            {% if is_multi_shipping_enabled and customerAddresses()|length > 1 %}
                             <td>
-                                <select name="product_address[{{ item.product_id }}]">
-                                {% for address in addresses %}
-                                    <option value="{{ address.value }}"{% if item.get('customer_address_id') == address.value %} selected="selected"{% endif %}>{{ address.label }}</option>
+                                <select name="product_address[{{ item.product_id }}]" class="form-control product-shipping">
+                                {% for address in customerAddresses() %}
+                                    <option value="{{ address.id }}"{% if item.get('customer_address_id') == address.id %} selected="selected"{% endif %}>{{ address.label }}</option>
                                 {% endfor %}
                                 </select>
                             </td>

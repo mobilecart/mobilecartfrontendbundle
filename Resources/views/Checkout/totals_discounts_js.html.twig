@@ -21,6 +21,8 @@
 
             self.containerEl.on('change', 'input[name="shipping_method"]', function(){
 
+                self.containerEl.find('div.totals-container .spinner').show();
+
                 var code = $(this).val();
 
                 var values = {
@@ -39,34 +41,67 @@
                 });
             });
 
-            self.containerEl.on('change', 'input.qty-input', function(){
-
-                // first gather all qty inputs, and their values
+            self.containerEl.on('change', 'select.multi-shipping', function(){
 
                 self.containerEl.find('div.totals-container .spinner').show();
 
-                var values = {};
-                self.containerEl.find('input.qty-input').each(function(){
-                    var qtyInput = $(this);
-                    var key = qtyInput.attr('name');
-                    var value = qtyInput.val();
-                    values[key] = value;
+                var updateUrl = '{{ path('cart_shipment_add') }}' + '?format=json';
+
+                var postData = {};
+                $('select.multi-shipping').each(function(){
+                    var self = $(this);
+                    var name = self.attr('name');
+                    postData[name] = self.val();
                 });
-
-                // update qtys
-
-                var updateUrl = '{{ path('cart_update_qtys') }}' + '?format=json';
 
                 $.ajax({
                     url: updateUrl,
                     method: 'POST',
                     dataType: 'json',
-                    data: values
+                    data: postData
                 }).done(function(){
                     self.render();
                 });
             });
 
+            self.containerEl.on('change', 'input.qty-input', function(){
+                self.updateCart();
+            });
+
+            self.containerEl.on('change', 'select.product-shipping', function(){
+                self.updateCart();
+            });
+
+        },
+        updateCart: function() {
+            var self = this;
+            // first gather all qty inputs, and their values
+
+            self.containerEl.find('div.totals-container .spinner').show();
+
+            var postData = {};
+            self.containerEl.find('input.qty-input').each(function(){
+                var qtyInput = $(this);
+                var key = qtyInput.attr('name');
+                postData[key] = qtyInput.val();
+            });
+
+            $('select.product-shipping').each(function(){
+                var self = $(this);
+                var name = self.attr('name');
+                postData[name] = self.val();
+            });
+
+            var updateUrl = '{{ path('cart_update_qtys') }}' + '?format=json';
+
+            $.ajax({
+                url: updateUrl,
+                method: 'POST',
+                dataType: 'json',
+                data: postData
+            }).done(function(){
+                self.render();
+            });
         },
         render: function() {
             var self = this;
