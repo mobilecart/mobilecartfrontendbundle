@@ -39,21 +39,30 @@ CheckoutWidget.prototype = {
             }
         });
 
-        $('#checkout_shipping_address_is_shipping_same').click(function(e){
+        var shippingSameChkbox = $('#checkout_shipping_address_is_shipping_same');
+
+        shippingSameChkbox.click(function(e){
             var chk = $(this);
             if (chk.is(':checked')) {
-                $('.billing-input').each(function(){
-                    var billing = $(this);
-                    var elId = billing.attr('id');
-                    var re = /billing/gi;
-                    var shippingElId = elId.replace(re, 'shipping');
-                    var shipping = $('#' + shippingElId);
-                    shipping.val(billing.val());
-                    shipping.attr('disabled', true);
-                });
+                widget.copyBillingToShipping();
             } else {
                 $('.shipping-input').attr('disabled', false);
             }
+        });
+
+        if (shippingSameChkbox.is(':checked')) {
+            widget.copyBillingToShipping();
+        }
+    },
+    copyBillingToShipping: function() {
+        $('.billing-input').each(function(){
+            var billing = $(this);
+            var elId = billing.attr('id');
+            var re = /billing/gi;
+            var shippingElId = elId.replace(re, 'shipping');
+            var shipping = $('#' + shippingElId);
+            shipping.val(billing.val());
+            shipping.attr('disabled', true);
         });
     },
     paymentHandlers: {
@@ -100,7 +109,7 @@ CheckoutWidget.prototype = {
 
         if (sectionKey == 'payment_methods') {
             if (typeof callbackData == 'undefined') {
-                var method = section.find("input[name='payment_method']").val();
+                var method = section.find("input[name='payment_method']:checked").val();
                 postData = widget.paymentHandlers[method](buttonEl);
                 if (typeof postData.callback != 'undefined') {
                     return false;

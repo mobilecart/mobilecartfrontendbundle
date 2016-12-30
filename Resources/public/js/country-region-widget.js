@@ -48,6 +48,7 @@ CountryRegionWidget.prototype = {
             }
             select += '</select>';
             regionInput.replaceWith(select);
+            regionInput.val(regionInputValue);
         } else {
             // todo: build text input
 
