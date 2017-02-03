@@ -1,0 +1,14 @@
+<script type="text/javascript" src="{{ asset('bundles/mobilecartcore/js/config-product-addtocart.js') }}"></script>
+<script type="text/javascript">
+    $(function(){
+        $('div.product.type-2').each(function(){
+            var self = $(this);
+            var config = JSON.parse(self.attr('data-config'));
+            new ConfigProductAddtocart({
+                container: self,
+                productType: 2,
+                productConfig: config
+            });
+        });
+    });
+</script>

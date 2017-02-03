@@ -4,42 +4,10 @@
 
 {% block content %}
 
-{#% if result.searchQuery is defined %}
-    <div><pre>{{ result.searchQuery }}</pre></div>
-{% endif %}
-{% if result.facetQuery is defined %}
-    <div><pre>{{ result.facetQuery }}</pre></div>
-{% endif %#}
-
 <div class="container">
 
     <form id="pager-form" action="{{ path('cart_categories') }}">
-    <div class="row">
-        <div class="col-sm-6 brand-logo">
-            <i class="fa fa-shopping-cart fa-5x pull-left"></i>
-            <h1>Mobile Cart</h1>
-        </div>
-        <div class="col-sm-6 search-bar">
-            <div class="search-bar-links">
-                <a href="{{ path('cart_view') }}">Cart</a> | <a href="{{ path('cart_checkout') }}">Checkout</a>
-            </div>
-            <div id="scrollable-dropdown-menu" class="input-group">
-                {% if search.query|length > 0 %}
-                    <span class="input-group-btn">
-                <button class="btn btn-default search-clear" type="button">
-                    <i class="glyphicon glyphicon-remove"></i>
-                </button>
-            </span>
-                {% endif %}
-                <input type="text" data-provide="typeahead" autocomplete="off" id="text-search" class="form-control search-query typeahead" name="{{ search.queryparam }}" value="{{ search.query }}" placeholder="Search..." />
-            <span class="input-group-btn">
-                <button class="btn btn-default search-submit" type="button">
-                    <i class="fa fa-search"></i>
-                </button>
-            </span>
-            </div>
-        </div>
-    </div>
+    {% include templatePath('Shared:header-bar.html.twig') %}
 
     <div class="row carousel-holder">
         <div class="col-sm-12">
@@ -69,42 +37,49 @@
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="input-group">
-                <input type="text" class="form-control search-query" name="{{ search.queryparam }}" value="{{ search.query }}" placeholder="Search..." />
-                <span class="input-group-btn">
-                    <button class="btn btn-default search-submit" type="button">
-                        <i class="fa fa-search"></i>
-                    </button>
-                </span>
-            </div>
-        </div>
-    </div>
-    <div class="row sorting pager">
-        <div class="col-sm-12">
-            <div class="">
-                <select name="sort" id="sort-by">
+
+        <div class="row">
+            <div class="col-sm-6">
+                <button class="btn pull-left btn-default dropdown-toggle" type="button" id="sort-by-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Sort
                     {% for sortable in sortable('category') %}
-                        <option data-dir="{{ sortable.dir }}" value="{{ sortable.value }}"{% if sortable.active %} selected="selected"{% endif %}>{{ sortable.label }}</option>
+                        {% if sortable.active %} By {{ sortable.label }}{% endif %}
                     {% endfor %}
-                </select>
-            </div>
-            <div class="pull-right btn-group input-group" role="group">
-                <button type="button" class="btn pull-left btn-default prev {% if search.page <= 1 %}disabled{% endif %}" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
+                    <span class="caret"></span>
                 </button>
-                <input type="number" id="page" class="form-control number" name="{{ search.pageParam }}" value="{{ search.page }}" />
-                <button type="button" class="btn pull-right btn-default next {% if search.page >= result.pages %}disabled{% endif %}" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </button>
+                <ul class="dropdown-menu" aria-labelledby="sort-by-dropdown">
+                    {% for sortable in sortable('category') %}
+                        <li class="navbar-dropdown">
+                            <a href="#" class="sort-by-input">
+                                <input type="radio" name="sort" data-dir="{{ sortable.dir }}" class="sort-by" value="{{ sortable.value }}" {% if sortable.active %} checked="checked"{% endif %} />
+                                {{ sortable.label }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
             </div>
+            <div class="col-sm-6">
+
+                <div class="pull-right btn-group input-group pager" role="group">
+
+                    <button type="button" class="btn pull-left btn-default prev {% if search.page <= 1 %}disabled{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </button>
+                    <input type="number" id="page" class="form-control number" name="{{ search.pageParam }}" value="{{ search.page }}" />
+                    <button type="button" class="btn pull-right btn-default next {% if search.page >= result.pages %}disabled{% endif %}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <input type="hidden" name="direction" id="sort-dir" value="{{ sortDir() }}" />
+            {% for filterCode, filterValue in search.facetFilters %}
+                <input type="hidden" name="{{ filterCode }}" value="{{ filterValue }}" />
+            {% endfor %}
+
         </div>
-        <input type="hidden" name="direction" id="sort-dir" value="{{ sortDir() }}" />
-        {% for filterCode, filterValue in search.facetFilters %}
-            <input type="hidden" name="{{ filterCode }}" value="{{ filterValue }}" />
-        {% endfor %}
-    </div>
+
     </form>
     <div class="row category-list">
 

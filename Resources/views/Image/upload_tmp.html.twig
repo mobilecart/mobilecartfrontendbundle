@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.rawgit.com/konvajs/konva/1.2.2/konva.min.js"></script>
+    <script src="{{ asset('bundles/mobilecartfrontend/js/jquery-1.11.0.min.js') }}"></script>
+    <meta charset="utf-8">
+    <title>Konva Image Resize Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #F0F0F0;
+        }
+    </style>
+</head>
+<body>
+<div id="container" style="width:300px;height:450px;border:1px solid #000;"></div>
+<div>
+    <input type="file" id="image-upload" name="image-upload" />
+    <button id="upload-btn">Upload</button>
+    <br>
+    <input type="text" id="text-update" name="text-update" />
+    <button id="update-text-btn">Update Text</button>
+    <div id="image-container">
+
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(function(){
+
+        $('button#upload-btn').on('click', function(e){
+            uploadImage();
+            return true;
+        });
+
+        $('button#update-text-btn').on('click', function(e){
+            var newText = $('#text-update').val();
+            updateText(newText);
+            return true;
+        });
+    });
+
+    var imageLoader = document.getElementById('image-upload');
+    imageLoader.addEventListener('change', handleImage, false);
+
+    function handleImage(e){
+
+        var file = e.target.files[0];
+        var isImage = file.type == 'image/jpeg' || file.type == 'image/png' || file.type == 'image/gif';
+        if (!isImage) {
+            return;
+        }
+
+        var canvas = $('div.konvajs-content canvas').get(0);
+        //var ctx = canvas.getContext('2d');
+
+        var reader = new FileReader();
+        reader.onload = function(event){
+            var img = new Image();
+            img.onload = function(){
+
+                var tmpCanvas = document.createElement('canvas');
+                tmpCanvas.width = img.width;
+                tmpCanvas.height = img.height;
+                var tmpCtx = tmpCanvas.getContext('2d');
+                tmpCtx.drawImage(img,0,0);
+
+                var newImg = new Konva.Image({
+                    width: img.width,
+                    height: img.height
+                });
+
+                var newGroup = new Konva.Group({
+                    x: 20,
+                    y: 20,
+                    draggable: true
+                });
+                layer.add(newGroup);
+                newGroup.add(newImg);
+                addAnchor(newGroup, 0, 0, 'topLeft');
+                addAnchor(newGroup, img.height, 0, 'topRight');
+                addAnchor(newGroup, img.width, img.height, 'bottomRight');
+                addAnchor(newGroup, 0, img.height, 'bottomLeft');
+
+                var newObj = new Image();
+                newObj.onload = function() {
+                    newImg.image(newObj);
+                    layer.draw();
+                };
+
+                newObj.src = tmpCanvas.toDataURL();
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+
+    function updateText(newText) {
+        stage.remove(layer);
+        simpleText.text(newText);
+        stage.add(layer);
+    }
+
+    function updateImage() {
+        var canvas = $('div.konvajs-content canvas').get(0);
+        var url = canvas.toDataURL();
+        var newImg = document.createElement("img");
+        newImg.src = url;
+        $('div#image-container').empty().append(newImg);
+    }
+
+    function uploadImage() {
+        var canvas = $('div.konvajs-content canvas').get(0);
+
+        var ctx = canvas.getContext('2d');
+        ctx.font = 'italic 20pt Calibri';
+        ctx.fillText('Hello World!', 150, 100);
+
+        var url = canvas.toDataURL();
+        var postData = {
+            base64: url
+        };
+
+        $.ajax({
+            type: 'POST',
+            data: postData,
+            dataType: 'json',
+            url: "{{ path('cart_image_upload_base64') }}",
+            success: function(response) {
+                if (typeof response.success != 'undefined' && response.success == 1) {
+                    var newImg = document.createElement("img");
+                    newImg.src = '/' + response.filename;
+                    $('div#image-container').empty().append(newImg);
+                }
+            }
+        });
+    }
+
+    var width = 300; //window.innerWidth;
+    var height = 450; //window.innerHeight;
+
+    function update(activeAnchor) {
+        var group = activeAnchor.getParent();
+
+        var topLeft = group.get('.topLeft')[0];
+        var topRight = group.get('.topRight')[0];
+        var bottomRight = group.get('.bottomRight')[0];
+        var bottomLeft = group.get('.bottomLeft')[0];
+        var image = group.get('Image')[0];
+
+        var anchorX = activeAnchor.getX();
+        var anchorY = activeAnchor.getY();
+
+        // update anchor positions
+        switch (activeAnchor.getName()) {
+            case 'topLeft':
+                topRight.setY(anchorY);
+                bottomLeft.setX(anchorX);
+                break;
+            case 'topRight':
+                topLeft.setY(anchorY);
+                bottomRight.setX(anchorX);
+                break;
+            case 'bottomRight':
+                bottomLeft.setY(anchorY);
+                topRight.setX(anchorX);
+                break;
+            case 'bottomLeft':
+                bottomRight.setY(anchorY);
+                topLeft.setX(anchorX);
+                break;
+        }
+
+        image.position(topLeft.position());
+
+        var width = topRight.getX() - topLeft.getX();
+        var height = bottomLeft.getY() - topLeft.getY();
+        if(width && height) {
+            image.width(width);
+            image.height(height);
+        }
+    }
+
+    function addAnchor(group, x, y, name) {
+        var stage = group.getStage();
+        var layer = group.getLayer();
+
+        var anchor = new Konva.Circle({
+            x: x,
+            y: y,
+            stroke: '#666',
+            fill: '#ddd',
+            strokeWidth: 2,
+            radius: 2,
+            name: name,
+            draggable: true,
+            dragOnTop: false
+        });
+
+        anchor.on('dragmove', function() {
+            update(this);
+            layer.draw();
+        });
+        anchor.on('mousedown touchstart', function() {
+            group.setDraggable(false);
+            this.moveToTop();
+        });
+        anchor.on('dragend', function() {
+            group.setDraggable(true);
+            layer.draw();
+        });
+        // add hover styling
+        anchor.on('mouseover', function() {
+            var layer = this.getLayer();
+            document.body.style.cursor = 'pointer';
+            this.setStrokeWidth(4);
+            layer.draw();
+        });
+        anchor.on('mouseout', function() {
+            var layer = this.getLayer();
+            document.body.style.cursor = 'default';
+            this.setStrokeWidth(2);
+            layer.draw();
+        });
+
+        group.add(anchor);
+    }
+
+    var stage = new Konva.Stage({
+        container: 'container',
+        width: width,
+        height: height
+    });
+
+    var layer = new Konva.Layer();
+    //stage.add(layer);
+    ////
+
+    var simpleText = new Konva.Text({
+        x: stage.getWidth() / 2,
+        y: 15,
+        text: 'Simple Text',
+        fontSize: 30,
+        fontFamily: 'Calibri',
+        fill: 'green'
+    });
+
+    // to align text in the middle of the screen, we can set the
+    // shape offset to the center of the text shape after instantiating it
+    simpleText.setOffset({
+        x: simpleText.getWidth() / 2
+    });
+
+    // since this text is inside of a defined area, we can center it using
+    // align: 'center'
+    var complexText = new Konva.Text({
+        x: 20,
+        y: 60,
+        text: 'COMPLEX TEXT\n\nAll the world\'s a stage, and all the men and women merely players. They have their exits and their entrances.',
+        fontSize: 18,
+        fontFamily: 'Calibri',
+        fill: '#555',
+        width: 300,
+        padding: 20,
+        align: 'center'
+    });
+
+    var rect = new Konva.Rect({
+        x: 20,
+        y: 60,
+        stroke: '#555',
+        strokeWidth: 5,
+        fill: '#ddd',
+        width: 300,
+        height: complexText.getHeight(),
+        shadowColor: 'black',
+        shadowBlur: 10,
+        shadowOffset: [10, 10],
+        shadowOpacity: 0.2,
+        cornerRadius: 10
+    });
+
+    // add the shapes to the layer
+    layer.add(simpleText);
+    layer.add(rect);
+    layer.add(complexText);
+
+    // add the layer to the stage
+    stage.add(layer);
+
+
+
+</script>
+
+</body>
+</html>

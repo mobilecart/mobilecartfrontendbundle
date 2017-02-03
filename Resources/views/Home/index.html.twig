@@ -1,54 +1,8 @@
 {% extends frontend() %}
-
 {% block javascripts %}
-{{ parent() }}
-
-<script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/typeahead.bundle.min.js') }}"></script>
-<script type="text/javascript">
-    $(function() {
-
-        var pagerForm = $('#pager-form');
-        var textInput = $('input#text-search');
-
-        // fulltext search-query
-        textInput.keypress(function(e){
-            // todo : auto search
-            if (e.which == 13) {
-                pagerForm.submit();
-            }
-        });
-
-        var searchURL = "{{ path('cart_products') }}" + "?format=json&q=%QUERY";
-        var engine = new Bloodhound({
-            remote: {
-                url: searchURL,
-                wildcard: '%QUERY',
-                transform: function(response) {
-                    return response.result.entities;
-                }
-            },
-            identify: function(obj) {
-                return obj.id;
-            },
-            queryTokenizer: Bloodhound.tokenizers.whitespace,
-            datumTokenizer: Bloodhound.tokenizers.whitespace
-        });
-
-        $('input.typeahead').typeahead({
-                    minLength: 2,
-                    highlight: true
-                },
-                {
-                    name: 'products',
-                    display: 'name',
-                    displayKey: 'name',
-                    source: engine
-                }
-        );
-    });
-</script>
+    {{ parent() }}
+    {% include templatePath('Shared:js-autocomplete.html.twig') %}
 {% endblock %}
-
 {% block content %}
 
 <div class="container">

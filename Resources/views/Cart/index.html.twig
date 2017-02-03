@@ -1,24 +1,4 @@
 {% extends frontend() %}
-
-{% block javascripts %}
-    {{ parent() }}
-
-
-    {% if isSpaEnabled() %}
-    <!--
-    <script src="{{ asset('bundles/mobilecartfrontend/js/cart.js') }}"></script>
-    <script type="text/javascript">
-        $(function() {
-            App.collections.cartInfo = new App.collections.CartInfoCollection();
-            App.collections.cartInfo.fetch();
-            //Backbone.history.start({pushState: true});
-        });
-    </script>
-    -->
-    {% endif %}
-
-{% endblock %}
-
 {% block content %}
 
 <div class="container">
@@ -46,11 +26,11 @@
                             <td>
                                 {% if item.parent_options|length > 0 %}
                                 <a href="{{ path('cart_product_view', { 'slug': item.parent_options.slug }) }}">
-                                    <img class="img-responsive" src="{{ asset(imagePath('product', item, 'cart_row')) }}" alt="{{ item.name }}" />
+                                    <img class="img-responsive" width="100" height="100" src="{{ asset(imagePath('product', item, 'list_grid')) }}" alt="{{ item.name }}" />
                                 </a>
                                 {% else %}
                                 <a href="{{ path('cart_product_view', { 'slug': item.slug }) }}">
-                                    <img class="img-responsive" src="{{ asset(imagePath('product', item, 'cart_row')) }}" alt="{{ item.name }}" />
+                                    <img class="img-responsive" width="100" height="100" src="{{ asset(imagePath('product', item, 'list_grid')) }}" alt="{{ item.name }}" />
                                 </a>
                                 {% endif %}
                             </td>

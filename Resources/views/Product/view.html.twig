@@ -7,159 +7,8 @@
 
 {% block javascripts %}
 {{ parent() }}
-
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/typeahead.bundle.min.js') }}"></script>
-    <script type="text/javascript">
-        $(function() {
-
-            var pagerForm = $('#pager-form');
-            var textInput = $('input#text-search');
-
-            // fulltext search-query
-            textInput.keypress(function(e){
-                // todo : auto search
-                if (e.which == 13) {
-                    pagerForm.submit();
-                }
-            });
-
-            var searchURL = "{{ path('cart_products') }}" + "?format=json&q=%QUERY";
-            var engine = new Bloodhound({
-                remote: {
-                    url: searchURL,
-                    wildcard: '%QUERY',
-                    transform: function(response) {
-                        return response.result.entities;
-                    }
-                },
-                identify: function(obj) {
-                    return obj.id;
-                },
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                datumTokenizer: Bloodhound.tokenizers.whitespace
-            });
-
-            $('input.typeahead').typeahead({
-                        minLength: 2,
-                        highlight: true
-                    },
-                    {
-                        name: 'products',
-                        display: 'name',
-                        displayKey: 'name',
-                        source: engine
-                    }
-            );
-
-            //initialize add-to-cart button, etc
-            //App.views.productView = new App.views.ProductView();
-
-            //App.collections.cartInfo = new App.collections.CartInfoCollection();
-            //App.collections.cartInfo.fetch();
-
-            //Backbone.history.start({pushState: true});
-
-            var productConfig = {{ entity.config|raw }};
-            var optionProducts = {
-                init: function(productType) {
-                    switch(productType) {
-                        case 1:
-
-                            break;
-                        case 2:
-                            if (_.has(productConfig, 'config_values')
-                                    && _.isArray(productConfig['config_values'])) {
-
-                                var configValues = productConfig['config_values'];
-                                _.forEach(configValues, function(configValue){
-                                    if (_.has(configValue, 'var_code')) {
-                                        var varCode = configValue['var_code'];
-                                        var products = [];
-                                        if (_.has(configValue, 'product_values')
-                                                && _.isArray(configValue['product_values'])) {
-
-                                            var productValue = _.first(configValue['product_values']);
-                                            if (_.has(productValue, 'products')
-                                                    && _.isArray(productValue['products'])) {
-
-                                                products = productValue['products'];
-                                            }
-                                        }
-
-                                        optionProducts.options[varCode] = products;
-                                    }
-                                });
-
-                                $('select.config-option').change(function(e){
-                                    var anOption = $(this);
-                                    optionProducts.selectConfigurableOption(anOption.attr('name'), anOption.val());
-                                });
-
-                                $('form.add-to-cart').submit(function(e){
-
-                                    if (productConfig['config_values'].length == 0) {
-                                        return true;
-                                    }
-
-                                    var isOk = false;
-                                    var simples = [];
-                                    var i = 0;
-                                    for(key in optionProducts.options) {
-
-                                        if (i == 0) {
-                                            simples = optionProducts.options[key];
-                                        } else {
-                                            simples = _.intersection(optionProducts.options[key], simples);
-                                        }
-                                        i++;
-                                    }
-
-                                    if (simples.length > 0) {
-                                        _.forEach(simples, function(simple){
-                                            if (_.contains(productConfig['is_in_stock'], simple)) {
-                                                $('input#simple_id').val(simple);
-                                                isOk = true;
-                                                //break;
-                                            }
-                                        });
-                                    }
-
-                                    return isOk;
-                                });
-                            }
-                            break;
-                        default:
-
-                            break;
-                    }
-                },
-                selectConfigurableOption: function(varCode, varValue) {
-                    if (_.has(productConfig, 'config_values')) {
-                        var configValues = productConfig['config_values'];
-                        _.forEach(configValues, function(configValue){
-                            if (_.has(configValue, 'var_code') &&
-                                    configValue['var_code'] == varCode) {
-
-                                if (_.has(configValue, 'product_values')) {
-                                    var productValues = configValue['product_values'];
-                                    _.forEach(productValues, function(productValue){
-                                        if (_.has(productValue, 'value') &&
-                                                productValue['value'] == varValue &&
-                                                _.has(productValue, 'products')) {
-
-                                            optionProducts.options[varCode] = productValue['products'];
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
-                },
-                options : {}
-            };
-            optionProducts.init({{ entity.type }});
-        });
-    </script>
+    {% include templatePath('Shared:js-autocomplete.html.twig') %}
+    {% include templatePath('Shared:js-productconfig.html.twig') %}
 {% endblock %}
 
 {% block content %}
@@ -171,62 +20,31 @@
     </form>
 
     <div class="row">
-        <div class="col-sm-12">
-            <img class="slide-image" src="{{ asset(imagePath('product', entity, 'view_jumbo')) }}" alt="" />
+        <div class="col-xs-12">
+            <h1>{{ entity.name }}</h1>
+            <p><small>{{ entity.sku }}</small></p>
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12 col-md-6 product-tabs">
-            <h1>{{ entity.name }}</h1>
-            <ul class="nav nav-tabs">
-                <li class="active">
-                    <a href="#general" data-toggle="tab" aria-expanded="true">General</a>
-                </li>
-                <li>
-                    <a href="#misc" data-toggle="tab" aria-expanded="false">Misc</a>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div id="general" class="tab-pane fade active in">
-                    <p>{{ entity.content|raw }}</p>
-                </div>
-                <div id="misc" class="tab-pane">
-                    <ul>
-                        <li>SKU: {{ entity.sku }}</li>
-                    </ul>
-                </div>
-            </div>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            <img class="slide-image" src="{{ asset(imagePath('product', entity, 'list_grid')) }}" alt="{{ entity.name }}" />
         </div>
-        <div class="col-md-6 col-sm-12">
-            <div class="row">
-                <div class="col-sm-12">
-                    <h2 class="pull-right">{{ decorate(entity.price) }}</h2>
-                </div>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 product type-{{ entity.type }}" data-config='{{ entity.config|raw }}'>
+            <div class="price-box">
+                <p class="price">{{ decorate(entity.price) }}</p>
             </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <form method="post" class="add-to-cart" action="{{ path('cart_add_item', {'id': entity.id}) }}">
-                        {% if entity.type == 2 %}
-                            <input type="hidden" id="simple_id" name="simple_id" value="" />
-                        {% endif %}
+            <div class="add-to-cart">
+                <form method="post" class="add-to-cart" action="{{ path('cart_add_item', {'id': entity.id}) }}">
+                    {% if entity.type == 2 %}
+                        <input type="hidden" class="simple_id" name="simple_id" value="" />
+                    {% endif %}
 
-                        {% if config_data.config_values is defined %}
-                            {% for option in config_data.config_values %}
-                                <div class="row">
-                                    <div class="col-xs-12">
-                                        <label for="{{ option.var_code }}">{{ option.label }}</label>
-                                        <select class="config-option form-control" name="{{ option.var_code }}">
-                                            {% for option_value in option.product_values %}
-                                                <option value="{{ option_value.value }}">{{ option_value.value }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
+                    {% if config_data.config_values is defined %}
+                        {% include templatePath('Shared:html-productconfig-options.html.twig') with {'config_data': config_data} %}
+                    {% endif %}
 
-                        <div class="cart-buttons pull-right">
-
+                    <div class="row cart-buttons">
+                        <div class="col-xs-12">
                             {% if entity.getIsInStock() %}
                                 <button type="submit" class="btn-lg btn-primary addtocart pull-right"><i class="fa fa-shopping-cart"> </i>&nbsp;Add to Cart</button>
                             {% elseif entity.canBackorder() %}
@@ -235,9 +53,29 @@
                                 <p>Currently Unavailable</p>
                             {% endif %}
                             <input type="hidden" name="qty" value="1" />
-
                         </div>
-                    </form>
+                    </div>
+                </form>
+            </div>
+            <div class="product-tabs">
+
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#general" data-toggle="tab" aria-expanded="true">General</a>
+                    </li>
+                    <li>
+                        <a href="#misc" data-toggle="tab" aria-expanded="false">Misc</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="general" class="tab-pane fade active in">
+                        <p>{{ entity.content|raw }}</p>
+                    </div>
+                    <div id="misc" class="tab-pane">
+                        <ul>
+                            <li>SKU: {{ entity.sku }}</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>

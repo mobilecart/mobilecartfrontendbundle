@@ -1,0 +1,14 @@
+{% if config_data.config_values is defined %}
+    {% for option in config_data.config_values %}
+        <div class="row">
+            <div class="col-xs-12">
+                <label for="{{ option.var_code }}">{{ option.label }}</label>
+                <select class="config-option form-control" name="{{ option.var_code }}">
+                    {% for option_value in option.product_values %}
+                        <option value="{{ option_value.value }}">{{ option_value.value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}

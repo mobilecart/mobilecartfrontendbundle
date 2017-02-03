@@ -1,37 +1,10 @@
 {% extends frontend() %}
-
 {% block searchTerm %}{{ search.searchTerm }}{% endblock %}
-
 {% block content %}
 
 <div class="container">
     <form id="pager-form" action="{{ path('cart_products') }}">
-    <div class="row">
-        <div class="col-sm-6 brand-logo">
-            <i class="fa fa-shopping-cart fa-5x pull-left"></i>
-            <h1>Mobile Cart</h1>
-        </div>
-        <div class="col-sm-6 search-bar">
-            <div class="search-bar-links">
-                <a href="{{ path('cart_view') }}">Cart</a> | <a href="{{ path('cart_checkout') }}">Checkout</a>
-            </div>
-            <div id="scrollable-dropdown-menu" class="input-group">
-                {% if search.query|length > 0 %}
-                    <span class="input-group-btn">
-                    <button class="btn btn-default search-clear" type="button">
-                        <i class="glyphicon glyphicon-remove"></i>
-                    </button>
-                </span>
-                {% endif %}
-                <input type="text" data-provide="typeahead" autocomplete="off" id="text-search" class="form-control search-query typeahead" name="{{ search.queryparam }}" value="{{ search.query }}" placeholder="Search..." />
-                <span class="input-group-btn">
-                    <button class="btn btn-default search-submit" type="button">
-                        <i class="fa fa-search"></i>
-                    </button>
-                </span>
-            </div>
-        </div>
-    </div>
+    {% include templatePath('Shared:header-bar.html.twig') %}
 
     {% if result.total > 0 %}
     <div class="row">
@@ -93,29 +66,28 @@
 
     <div class="row">
         <div class="col-sm-6">
-            <ol class="breadcrumb">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Library</a></li>
-                <li class="active">Data</li>
-            </ol>
+            <button class="btn pull-left btn-default dropdown-toggle" type="button" id="sort-by-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Sort
+                {% for sortable in sortable('product') %}
+                    {% if sortable.active %} By {{ sortable.label }}{% endif %}
+                {% endfor %}
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="sort-by-dropdown">
+                {% for sortable in sortable('product') %}
+                    <li class="navbar-dropdown">
+                        <a href="#" class="sort-by-input">
+                            <input type="radio" name="sort" data-dir="{{ sortable.dir }}" class="sort-by" value="{{ sortable.value }}" {% if sortable.active %} checked="checked"{% endif %} />
+                            {{ sortable.label }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
         </div>
         <div class="col-sm-6">
 
             <div class="pull-right btn-group input-group pager" role="group">
-                <button class="btn pull-left btn-default dropdown-toggle" type="button" id="sort-by-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    Sort
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="sort-by-dropdown">
-                    {% for sortable in sortable('product') %}
-                        <li class="navbar-dropdown">
-                            <a href="#" class="sort-by-input">
-                                <input type="radio" name="sort" data-dir="{{ sortable.dir }}" class="sort-by" value="{{ sortable.value }}" {% if sortable.active %} checked="checked"{% endif %} />
-                                {{ sortable.label }}
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
+
                 <button type="button" class="btn pull-left btn-default prev {% if search.page <= 1 %}disabled{% endif %}" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </button>
@@ -123,10 +95,6 @@
                 <button type="button" class="btn pull-right btn-default next {% if search.page >= result.pages %}disabled{% endif %}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </button>
-            </div>
-
-            <div class="dropdown pull-right sorting">
-
             </div>
 
         </div>
@@ -148,12 +116,12 @@
 
     <div class="row product-list">
 
-        {% if result.entities is defined and not isSpaEnabled() %}
+        {% if result.entities is defined %}
             {% for entity in result.entities %}
-                <div class="col-sm-4 col-lg-3 col-md-4">
+                <div class="col-sm-4 col-lg-3 col-md-4 product type-{{ entity.type }}" data-config='{{ entity.config|raw }}'>
                     <div class="thumbnail">
                         <a href="{{ path('cart_product_view', { 'slug': entity.slug }) }}">
-                            <img src="{{ asset(imagePath('product', entity, 'list_grid')) }}" alt="">
+                            <img src="{{ asset(imagePath('product', entity, 'list_grid')) }}" alt="" />
                         </a>
 
                         <div class="caption">
@@ -165,7 +133,11 @@
                             <div class="col-xs-12">
                                 <form method="post" class="add-to-cart" action="{{ path('cart_add_item', {'id':entity.id}) }}">
                                     {% if entity.type > 1 %}
-                                        <input type="hidden" id="simple_id" name="simple_id" value="" />
+                                        <input type="hidden" class="simple_id" name="simple_id" value="" />
+
+                                        {% if configDecode(entity.config)|length > 0 %}
+                                            {% include templatePath('Shared:html-productconfig-options.html.twig') with {'config_data': configDecode(entity.config)} %}
+                                        {% endif %}
                                     {% endif %}
 
                                     {% if entity.is_in_stock %}
@@ -198,279 +170,22 @@
 {% endblock %}
 
 {% block javascripts %}
-
-    {{ parent() }}
-
-    {% if isSpaEnabled() %}
-
-    <script src="{{ asset('bundles/mobilecartfrontend/js/backbone-min.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartfrontend/js/backbone.localStorage.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartfrontend/js/backbone.paginator.min.js') }}"></script>
-
-    <script type="text/html" id="paginationTemplate">
-        <% if (currentPage != 1) { %>
-        <button class="prev btn-default btn">Prev</button>
-        <% } %>
-        <div class="btn-group">
-            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Page <%= currentPage %> <span class="caret"></span></button>
-            <ul class="dropdown-menu">
-                <% for(p=1;p<=totalPages;p++){ %>
-                <% if (currentPage == p) { %>
-                <li class="active"><a href="#" class="page"><%= p %></a></li>
-                <% } else { %>
-                <li><a href="#" class="page"><%= p %></a></li>
-                <% } %>
-                <% }%>
-            </ul>
-        </div>
-        <% if (lastPage != currentPage && lastPage != 0) { %>
-        <button class="btn btn-default next">Next</button>
-        <% } %>
-    </script>
-
-    <script type="text/html" id="sortingTemplate">
-        <div class="btn-group">
-            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle">Sort by <strong><span id="sortByText">popularity</span></strong> <span class="caret"></span></button>
-            <ul class="dropdown-menu sort-by">
-                <li><a href="date">Date</a></li>
-                <li><a href="name">Name</a></li>
-                <li><a href="popularity">Popularity</a></li>
-            </ul>
-        </div>
-    </script>
-
-    <script type="text/template" id="facetLabel">
-        <a href="#" class="facet-label"><%- label %><i class="fa fa-arrow"></i></a>
-    </script>
-
-    <script type="text/template" id="active-facet-link">
-        <% if (typeof(remove_url) != "undefined" && remove_url.length > 0) { %>
-        <a href="<%- remove_url %>" class="facet-remove-link">
-            <i class="fa fa-times"></i>
-            <%- label %> : <%- term %>
-            <span class="badge pull-right"><%- count %></span>
-        </a>
-        <% } %>
-    </script>
-
-    <script type="text/template" id="facetLink">
-        <% if (typeof(remove_url) != "undefined" && remove_url.length > 0) { %>
-        <a href="<%- remove_url %>" class="facet-remove-link">
-            <i class="fa fa-times"></i>
-            <%- term %>
-            <span class="badge pull-right"><%- count %></span>
-        </a>
-        <% } else { %>
-        <a href="<%- url %>" class="facet-link"><%- term %>
-            <span class="badge pull-right"><%- count %></span>
-        </a>
-        <% } %>
-    </script>
-
-    <script type="text/template" id="cart-total">
-        <div class="row">
-            <div class="col-xs-6"><%- label %></div>
-            <div class="col-xs-6"><%- value %></div>
-        </div>
-    </script>
-
-    <!-- todo: pass url as parameter -->
-    <script type="text/template" id="cart-item">
-        <div class="row">
-            <div class="col-xs-8">
-                <a href="/<%- slug %>"><%- name %></a>
-            </div>
-            <div class="col-xs-4"><%- qty %> x <%- price %></div>
-        </div>
-    </script>
-
-    <script type="text/template" id="cart-buttons">
-        <div class="row">
-            <div class="col-xs-6">
-                <a class="btn btn-default" href="/cart/view">View Cart</a>
-            </div>
-            <div class="col-xs-6">
-                <a class="btn btn-success" href="/cart/checkout">Checkout</a>
-            </div>
-        </div>
-    </script>
-
-    <script type="text/template" id="product-grid-single">
-
-        <div class="thumbnail">
-            <a href="/<%- slug %>"><img alt="" src="/bundles/mobilecartfrontend/images/320x150.gif"></a>
-            <div class="caption">
-                <h4><a href="/<%- slug %>"><%- name %></a></h4>
-                <h4>$<%- price %></h4>
-                <p></p>
-            </div>
-
-            <div class="row">
-                <div class="col-xs-6">
-                    <div class="ratings">
-                        <p>15 Reviews<br>
-                            <span class="glyphicon glyphicon-star"></span>
-                            <span class="glyphicon glyphicon-star"></span>
-                            <span class="glyphicon glyphicon-star"></span>
-                            <span class="glyphicon glyphicon-star"></span>
-                            <span class="glyphicon glyphicon-star"></span>
-                        </p>
-                    </div>
-                </div>
-                <div class="col-xs-6">
-                    <a href="/cart/add/<%- id %>" rel="nofollow" class="btn btn-primary addtocart">Add to Cart</a>
-                </div>
-            </div>
-        </div>
-
-    </script>
-
-    <script src="{{ asset('bundles/mobilecartfrontend/js/spin.min.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartfrontend/js/cart.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartfrontend/js/product-listing.js') }}"></script>
-
+{{ parent() }}
+    {% include templatePath('Shared:js-autocomplete.html.twig') %}
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartcore/js/config-product-addtocart.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/listing-pager.js') }}"></script>
     <script type="text/javascript">
         $(function(){
-
-            App.collections.paginatedItems = new App.collections.PaginatedCollection();
-            App.collections.paginatedItems.url = '{{ path('cart_products') }}';
-
-            {% if search.categoryId > 0 %}
-            App.collections.paginatedItems.queryParams['cat_id'] = {{ search.categoryId }};
-            {% endif %}
-
-            App.views.app = new App.views.AppView({collection: App.collections.paginatedItems});
-            App.views.pagination = new App.views.PaginatedView({collection:App.collections.paginatedItems});
-            //App.views.sorting = new App.views.SortedView({collection:App.collections.paginatedItems});
-            App.collections.paginatedItems.fetch();
-
-            App.collections.cartInfo = new App.collections.CartInfoCollection();
-            App.collections.cartInfo.fetch();
-
-            //Backbone.history.start({pushState: true});
+            $('div.product.type-2').each(function(){
+                var self = $(this);
+                var config = JSON.parse(self.attr('data-config'));
+                new ConfigProductAddtocart({
+                    container: self,
+                    productType: 2,
+                    productConfig: config
+                });
+            });
         });
     </script>
-
-    {% else %}
-
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/typeahead.bundle.min.js') }}"></script>
-
-    <script type="text/javascript">
-        $(function(){
-
-            var pagerForm = $('#pager-form');
-            var pageInput = $('input#page');
-            var sortByInput = $('input[name="sort"]');
-            var sortDirInput = $('input#sort-dir');
-            var textInput = $('input#text-search');
-
-            // paginator previous
-            $('button.prev').click(function(e){
-                e.preventDefault();
-                var el = $('input#page');
-                var page = parseInt(el.val()) - 1;
-                el.val(page);
-                pagerForm.submit();
-                return false;
-            });
-
-            // paginator next
-            $('button.next').click(function(e){
-                e.preventDefault();
-                var page = parseInt(pageInput.val()) + 1;
-                pageInput.val(page);
-                pagerForm.submit();
-                return false;
-            });
-
-            $('a.search-filter-link').click(function(e){
-                e.preventDefault();
-                var self = $(this);
-                var rel = self.attr('rel');
-                var relEl = $('input#' + rel);
-                if (relEl.attr('checked') == 'checked') {
-                    relEl.prop('checked', false);
-                } else {
-                    relEl.prop('checked', true);
-                }
-
-                pageInput.val(1);
-                pagerForm.submit();
-                return true;
-            });
-
-            $('button.search-submit').click(function(e){
-                pageInput.val(1);
-                pagerForm.submit();
-                return true;
-            });
-
-            $('button.search-clear').click(function(e){
-                textInput.val('');
-                pagerForm.submit();
-                return true;
-            });
-
-            $('a.sort-by-input').click(function(e){
-                e.preventDefault();
-                var self = $(this);
-                var radio = self.find('input[name="sort"]');
-                radio.prop('checked', true);
-                var sortDir = radio.attr('data-dir');
-                sortDirInput.val(sortDir);
-                pagerForm.submit();
-                return false;
-            });
-
-            // sort dropdown
-            sortByInput.change(function(e){
-                e.preventDefault();
-                var option = sortByInput.find(':selected');
-                var sortDir = option.attr('data-dir');
-                sortDirInput.val(sortDir);
-                pagerForm.submit();
-                return false;
-            });
-
-            // fulltext search-query
-            textInput.keypress(function(e){
-                // todo : auto search
-                if (e.which == 13) {
-                    pagerForm.submit();
-                }
-            });
-
-            var searchURL = "{{ path('cart_products') }}" + "?format=json&q=%QUERY";
-            var engine = new Bloodhound({
-                remote: {
-                    url: searchURL,
-                    wildcard: '%QUERY',
-                    transform: function(response) {
-                        return response.result.entities;
-                    }
-                },
-                identify: function(obj) {
-                    return obj.id;
-                },
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                datumTokenizer: Bloodhound.tokenizers.whitespace
-            });
-
-            $('input.typeahead').typeahead({
-                    minLength: 2,
-                    highlight: true
-                },
-                {
-                    name: 'products',
-                    display: 'name',
-                    displayKey: 'name',
-                    source: engine
-                }
-            );
-
-        });
-    </script>
-
-    {% endif %}
 
 {% endblock %}

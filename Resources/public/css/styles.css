@@ -6,6 +6,10 @@ header {
     background: #000;
 }
 
+h1.store-name {
+    color: #428bca;
+}
+
 .slide-image {
     width: 100%;
 }
@@ -19,7 +23,7 @@ header {
 }
 
 .caption {
-    height: 130px;
+    min-height: 80px;
     overflow: hidden;
 }
 
@@ -101,6 +105,7 @@ header {
     line-height: 24px;
 }
 
+.tt-suggestion a:hover,
 .tt-suggestion:hover {
     cursor: pointer;
     color: #fff;
@@ -252,6 +257,10 @@ input#page {
     width: 60px;
 }
 
+div.pager {
+    margin: 0;
+}
+
 input[type="number"] {
     width: 60px;
 }
@@ -262,6 +271,16 @@ div.product-tabs {
 
 div.product-tabs div.tab-pane {
     padding: 3px;
+}
+
+div.category-list,
+div.product-list {
+    margin-top: 25px;
+}
+
+div#customer_register label,
+div#customer_forgot_password label {
+    display:none;
 }
 
 div.brand-logo {
@@ -300,4 +319,7 @@ a.next-button {
     margin-top: 10px;
 }
 
-
+p.price {
+    font-size: 2.0em;
+    font-weight: bold;
+}

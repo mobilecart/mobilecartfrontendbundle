@@ -1,0 +1,55 @@
+<script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/typeahead.bundle.min.js') }}"></script>
+<script type="text/javascript">
+    $(function() {
+
+        var pagerForm = $('#pager-form');
+        var textInput = $('input#text-search');
+        var searchSubmit = $('button.search-submit');
+
+        // fulltext search-query
+        textInput.keypress(function(e){
+            // todo : auto search
+            if (e.which == 13) {
+                pagerForm.submit();
+            }
+        });
+
+        searchSubmit.on('click', function(){
+            pagerForm.submit();
+            return true;
+        });
+
+        var searchURL = "{{ path('cart_products') }}" + "?format=json&q=%QUERY";
+        var engine = new Bloodhound({
+            remote: {
+                url: searchURL,
+                wildcard: '%QUERY',
+                transform: function(response) {
+                    return response.result.entities;
+                }
+            },
+            identify: function(obj) {
+                return obj.id;
+            },
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            datumTokenizer: Bloodhound.tokenizers.whitespace
+        });
+
+        $('input.typeahead').typeahead(
+            {
+                minLength: 2,
+                highlight: true
+            },
+            {
+                name: 'products',
+                display: 'name',
+                displayKey: 'name',
+                source: engine,
+                templates: {
+                    empty: function(obj) { return '<div class="empty-message">No Matches Found</div>'; },
+                    suggestion: function(obj) { return '<div class=""><a href="' + App.serverURL + 'product/' + obj.slug + '">' + obj.name + '</a></div>'; }
+                }
+            }
+        );
+    });
+</script>
