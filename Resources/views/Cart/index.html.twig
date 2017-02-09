@@ -21,10 +21,12 @@
                     </thead>
                     <tbody>
                     {% if cartItems()|length > 0 %}
+
                         {% for item in cartItems() %}
+
                         <tr>
                             <td>
-                                {% if item.parent_options|length > 0 %}
+                                {% if item.get('parent_options')|length > 0 %}
                                 <a href="{{ path('cart_product_view', { 'slug': item.parent_options.slug }) }}">
                                     <img class="img-responsive" width="100" height="100" src="{{ asset(imagePath('product', item, 'list_grid')) }}" alt="{{ item.name }}" />
                                 </a>
@@ -52,7 +54,9 @@
                                 </a>
                             </td>
                         </tr>
+
                         {% endfor %}
+
                     </tbody>
                     <tfoot>
                         <tr>
@@ -186,7 +190,6 @@
             {{ cartJson() }}
         </pre>
     </div>#}
-
 
 </div>
 {% endblock %}
