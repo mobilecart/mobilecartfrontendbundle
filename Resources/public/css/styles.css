@@ -239,6 +239,10 @@ button.navbar-toggle {
     margin-top: 17px;
 }
 
+button.addtocart {
+    margin-top: 10px;
+}
+
 div.cart-dropdown {
     width: 360px;
     padding: 10px;

@@ -87,20 +87,24 @@ The Next button simply goes to the payment screen
                                         <tbody>
 
                                         {% if is_multi_shipping_enabled %}
-                                            {% for address_id, methods in cartShippingMethods('') %}
 
-                                                <tr>
-                                                    <td>{{ addressLabel(address_id) }}</td>
-                                                    <td class="text-center">
-                                                        <select name="shipping_methods[{{ address_id }}]" class="form-control multi-shipping">
-                                                            {% for method in methods %}
-                                                                <option value="{{ method.code }}"{% if cartHasShipmentMethodCode(method.code, address_id) %} selected="selected"{% endif %}>{{ method.company }} {{ method.method }}  {{ decorate(method.price) }}</option>
-                                                            {% endfor %}
-                                                        </select>
-                                                    </td>
-                                                </tr>
-
+                                            {% for src_address_key, address_ids in cartShippingMethods('') %}
+                                                {% for address_id, methods in address_ids %}
+                                                    {% if methods|length > 0 %}
+                                                        <tr>
+                                                            <td>{{ addressLabel(address_id) }}</td>
+                                                            <td class="text-center">
+                                                                <select name="shipping_methods[{{ src_address_key }}][{{ address_id }}]" class="form-control multi-shipping">
+                                                                    {% for method in methods %}
+                                                                        <option value="{{ method.code }}"{% if cartHasShipmentMethodCode(method.code, address_id, src_address_key) %} selected="selected"{% endif %}>{{ method.company }} {{ method.method }}  {{ decorate(method.price) }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                {% endfor %}
                                             {% endfor %}
+
                                         {% else %}
 
                                             <tr>
