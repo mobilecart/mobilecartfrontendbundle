@@ -84,7 +84,12 @@
                                 {% for item in cartItems() %}
                                     <div class="row">
                                         <div class="col-xs-8">
-                                            <a href="{{ path('cart_product_view', { 'slug': item.get('slug') }) }}">{{ item.get('name') }}</a>
+                                            {% if item.get('parent_options')|length > 0 %}
+                                                <a href="{{ path('cart_product_view', { 'slug': item.parent_options.slug }) }}">{{ item.get('name') }}</a>
+                                            {% else %}
+                                                <a href="{{ path('cart_product_view', { 'slug': item.slug }) }}">{{ item.get('name') }}</a>
+                                            {% endif %}
+
                                         </div>
                                         <div class="col-xs-4">{{ item.get('qty') }} x {{ decorate(item.get('price')) }}</div>
                                     </div>
