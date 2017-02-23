@@ -30,13 +30,17 @@
                         <tr>
                             <th>Order #</th>
                             <th>Date</th>
+                            <th>Status</th>
                             <th>Total</th>
                         </tr>
                         {% for order in orders %}
                         <tr>
-                            <td>{{ order.id }}</td>
-                            <td>mm/dd/yyyy</td>
-                            <td>{{ order.total }}</td>
+                            <td>
+                                <a href="{{ path('customer_order', {'id': order.id}) }}">{{ order.referencenbr }}</a>
+                            </td>
+                            <td>{{ order.status }}</td>
+                            <td>{{ order.createdat|date('m/d/Y') }}</td>
+                            <td>{{ decorate(order.basetotal) }}</td>
                         </tr>
                         {% endfor %}
                     </table>

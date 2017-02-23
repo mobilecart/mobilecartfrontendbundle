@@ -121,7 +121,7 @@
                                     <li><a href="{{ path('cart_admin_dashboard') }}">Admin Panel</a></li>
                                     <li><a href="{{ path('logout') }}">Logout</a></li>
                                 {% elseif is_granted('IS_AUTHENTICATED_FULLY') %}
-                                    <li><a href="{{ path('customer_profile') }}">Profile</a></li>
+                                    <li><a href="{{ path('customer_profile') }}">My Account</a></li>
                                     <li><a href="{{ path('logout') }}">Logout</a></li>
                                 {% else %}
                                     <li><a href="{{ path('login_route') }}">Login</a></li>
