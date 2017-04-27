@@ -68,13 +68,13 @@
         <div class="col-sm-6">
             <button class="btn pull-left btn-default dropdown-toggle" type="button" id="sort-by-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                 Sort
-                {% for sortable in sortable('product') %}
+                {% for sortable in search.getAdvSortable() %}
                     {% if sortable.active %} By {{ sortable.label }}{% endif %}
                 {% endfor %}
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" aria-labelledby="sort-by-dropdown">
-                {% for sortable in sortable('product') %}
+                {% for sortable in search.getAdvSortable() %}
                     <li class="navbar-dropdown">
                         <a href="#" class="sort-by-input">
                             <input type="radio" name="sort" data-dir="{{ sortable.dir }}" class="sort-by" value="{{ sortable.value }}" {% if sortable.active %} checked="checked"{% endif %} />
@@ -99,7 +99,7 @@
 
         </div>
 
-        <input type="hidden" name="direction" id="sort-dir" value="{{ sortDir() }}" />
+        <input type="hidden" name="direction" id="sort-dir" value="{{ search.getSortDir() }}" />
         {% for filterCode, filterValue in search.facetFilters %}
             <input type="hidden" name="{{ filterCode }}" value="{{ filterValue }}" />
         {% endfor %}

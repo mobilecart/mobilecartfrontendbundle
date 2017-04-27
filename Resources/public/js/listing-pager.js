@@ -9,9 +9,8 @@ $(function(){
     // paginator previous
     $('button.prev').click(function(e){
         e.preventDefault();
-        var el = $('input#page');
-        var page = parseInt(el.val()) - 1;
-        el.val(page);
+        var page = parseInt(pageInput.val()) - 1;
+        pageInput.val(page);
         pagerForm.submit();
         return false;
     });
@@ -60,6 +59,7 @@ $(function(){
         radio.prop('checked', true);
         var sortDir = radio.attr('data-dir');
         sortDirInput.val(sortDir);
+        pageInput.val(1);
         pagerForm.submit();
         return false;
     });
@@ -70,6 +70,7 @@ $(function(){
         var option = sortByInput.find(':selected');
         var sortDir = option.attr('data-dir');
         sortDirInput.val(sortDir);
+        pageInput.val(1);
         pagerForm.submit();
         return false;
     });

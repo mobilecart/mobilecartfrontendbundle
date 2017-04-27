@@ -42,13 +42,13 @@
             <div class="col-sm-6">
                 <button class="btn pull-left btn-default dropdown-toggle" type="button" id="sort-by-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                     Sort
-                    {% for sortable in sortable('category') %}
+                    {% for sortable in search.getAdvSortable() %}
                         {% if sortable.active %} By {{ sortable.label }}{% endif %}
                     {% endfor %}
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="sort-by-dropdown">
-                    {% for sortable in sortable('category') %}
+                    {% for sortable in search.getAdvSortable() %}
                         <li class="navbar-dropdown">
                             <a href="#" class="sort-by-input">
                                 <input type="radio" name="sort" data-dir="{{ sortable.dir }}" class="sort-by" value="{{ sortable.value }}" {% if sortable.active %} checked="checked"{% endif %} />
@@ -73,7 +73,7 @@
 
             </div>
 
-            <input type="hidden" name="direction" id="sort-dir" value="{{ sortDir() }}" />
+            <input type="hidden" name="direction" id="sort-dir" value="{{ search.getSortDir() }}" />
             {% for filterCode, filterValue in search.facetFilters %}
                 <input type="hidden" name="{{ filterCode }}" value="{{ filterValue }}" />
             {% endfor %}
@@ -109,106 +109,13 @@
 
     </div><!-- /row -->
 
-    <div class="row sorting-bottom pager-bottom">
-
-    </div>
-
 </div><!-- /container -->
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-
-    {% if isSpaEnabled() %}
-
-    <script src="{{ asset('bundles/mobilecartfrontend/js/spin.min.js') }}"></script>
-    <script src="{{ asset('bundles/mobilecartfrontend/js/cart.js') }}"></script>
-
-    <script type="text/javascript">
-        $(function(){
-
-            App.collections.paginatedItems = new App.collections.PaginatedCollection();
-            // todo :
-            App.collections.paginatedItems.url = App.serverURL + '/products';
-
-            {% if search.categoryId > 0 %}
-            App.collections.paginatedItems.queryParams['cat_id'] = {{ search.categoryId }};
-            {% endif %}
-
-            App.views.app = new App.views.AppView({collection: App.collections.paginatedItems});
-            App.views.pagination = new App.views.PaginatedView({collection:App.collections.paginatedItems});
-            //App.views.sorting = new App.views.SortedView({collection:App.collections.paginatedItems});
-            App.collections.paginatedItems.fetch();
-
-            App.collections.cartInfo = new App.collections.CartInfoCollection();
-            App.collections.cartInfo.fetch();
-
-            //Backbone.history.start({pushState: true});
-        });
-    </script>
-
-    {% else %}
-
-    <script type="text/javascript">
-        $(function(){
-
-            var pagerForm = $('#pager-form');
-            var pageInput = $('input#page');
-            var sortByInput = $('select#sort-by');
-            var sortDirInput = $('input#sort-dir');
-
-            // paginator previous
-            $('button.prev').click(function(e){
-                e.preventDefault();
-                var el = $('input#page');
-                var page = parseInt(el.val()) - 1;
-                el.val(page);
-                pagerForm.submit();
-                return false;
-            });
-
-            // paginator next
-            $('button.next').click(function(e){
-                e.preventDefault();
-                var page = parseInt(pageInput.val()) + 1;
-                pageInput.val(page);
-                pagerForm.submit();
-                return false;
-            });
-
-            /*
-            $('input.search-filter').click(function(e){
-                pageInput.val(1);
-                pagerForm.submit();
-                return true;
-            }); //*/
-
-            $('button.search-submit').click(function(e){
-                pageInput.val(1);
-                pagerForm.submit();
-                return true;
-            });
-
-            // sort dropdown
-            sortByInput.change(function(e){
-                e.preventDefault();
-                var option = sortByInput.find(':selected');
-                var sortDir = option.attr('data-dir');
-                sortDirInput.val(sortDir);
-                pagerForm.submit();
-                return false;
-            });
-
-            // fulltext search-query
-            $('input.search-query').keypress(function(e){
-                // todo : auto search
-                if (e.which == 13) {
-                    pagerForm.submit();
-                }
-            });
-        });
-    </script>
-
-    {% endif %}
+    {% include templatePath('Shared:js-autocomplete.html.twig') %}
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartcore/js/config-product-addtocart.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/listing-pager.js') }}"></script>
 
 {% endblock %}
