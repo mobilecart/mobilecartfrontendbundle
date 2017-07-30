@@ -9,7 +9,7 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="facet-{{ counter }}">
-                {% for termCounts in facets.terms %}
+                {% for termCounts in facets.terms if termCounts.term|length > 0 %}
                     <li class="navbar-dropdown">
                     {% if termCounts.remove_url is defined and termCounts.remove_url|length > 0 %}
                         <a href="{{ termCounts.remove_url }}"><i class="fa fa-times"></i>

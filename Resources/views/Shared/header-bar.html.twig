@@ -9,7 +9,24 @@
             <a href="{{ path('cart_view') }}">Cart</a> | <a href="{{ path('cart_checkout') }}">Checkout</a>
         </div>
         <div id="scrollable-dropdown-menu" class="input-group">
-            <input type="text" data-provide="typeahead" autocomplete="off" id="text-search" class="form-control search-query typeahead" name="q" value="" placeholder="Search..." />
+
+            {% if search.query|length > 0 %}
+                <span class="input-group-btn">
+                    <button class="btn btn-default search-clear" type="button">
+                        <i class="glyphicon glyphicon-remove"></i>
+                    </button>
+                </span>
+            {% endif %}
+
+                <input type="text"
+                       data-provide="typeahead"
+                       autocomplete="off"
+                       id="text-search"
+                       class="form-control search-query typeahead"
+                       name="{{ search.queryparam }}"
+                       value="{{ search.query }}"
+                       placeholder="Search..." />
+
                 <span class="input-group-btn">
                     <button class="btn btn-default search-submit" type="button">
                         <i class="fa fa-search"></i>
