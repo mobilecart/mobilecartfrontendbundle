@@ -1,5 +1,6 @@
 {% extends templatePath('Shared:edit.html.twig', 'frontend') %}
-{% block header_text %}Create Customer Address{% endblock %}
+{% block header_text %}Create Address{% endblock %}
+{% block panel_heading %} {% endblock %}
 {% block back_link %}
     <a href="{{ renderGridBackUrl('customer_addresses') }}" class="btn btn-default">Back</a>
 {% endblock %}
@@ -10,13 +11,7 @@
         <div class="col-sm-3">
             <nav role="navigation" class="navbar-default navbar-static-side ">
                 <div class="sidebar-collapse">
-                    <ul class="side-menu nav">
-                        {% for nav in navigation %}
-                            <li>
-                                <a href="{{ nav.url }}">{{ nav.label }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    {{ knp_menu_render(cartMenu('customer_dashboard')) }}
                 </div>
             </nav>
         </div>

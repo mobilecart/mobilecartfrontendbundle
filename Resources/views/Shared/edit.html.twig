@@ -2,28 +2,38 @@
 {% form_theme form 'bootstrap_3_layout.html.twig' %}
 {% block content %}
 
-    <div class="row admin-form">
+    <div class="row">
+        <div class="col-xs-12">
+            <h1 class="page-header">{% block header_text %} {% endblock %}</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12 header-buttons">
+            {% block back_link %} {% endblock %}
+            {% block save_button %}
+            <button type="submit" class="btn btn-success" id="form-submit">Save</button>
+            <span class="text-center spinner" style="display:none;">
+                <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+            </span>
+            {% endblock %}
+            {% block above_form_buttons %} {% endblock %}
+        </div>
+    </div>
+
+    <div class="row frontend-form">
         {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
         {% block container_start %}
         <div class="col-sm-12">
-            {% endblock %}
+        {% endblock %}
+
             <div class="panel panel-default">
+                {% block panel_heading %}
                 <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-6">
-                            {% block back_link %} {% endblock %}
-                            &nbsp;&nbsp; {% block header_text %} {% endblock %}
-                        </div>
-                        <div class="col-xs-6">
-                            <div class="pull-right">
-                                <button type="submit" class="btn btn-success" id="form-submit">Save</button>
-                                <div class="text-center spinner" style="display:none;">
-                                    <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <h4>{% block subheader_text %} {% endblock %}</h4>
                 </div>
+                {% endblock %}
                 <div class="panel-body">
                     <ul class="nav nav-tabs">
                         {% if form_sections is defined %}
@@ -103,24 +113,27 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('bundles/mobilecartfrontend/js/spin.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/ModalWidget.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/form-widget.js') }}"></script>
+    <script src="{{ asset(frontendAsset('js/spin.min.js')) }}"></script>
+    <script type="text/javascript" src="{{ asset(frontendAsset('js/ModalWidget.js')) }}"></script>
+    <script type="text/javascript" src="{{ asset(frontendAsset('js/form-widget.js')) }}"></script>
     <script type="text/javascript">
 
-        var formEl = $('div.admin-form form');
+        $(function(){
 
-        // handle modal UI
-        var modalWidget = new ModalWidget({
-            containerEl: $('#modal-shared'),
-            actions: []
-        });
+            var formEl = $('div.frontend-form form');
 
-        // handle admin form, ajax request/response
-        var formWidget = new AdminFormWidget({
-            formEl: formEl,
-            elPrefix: formEl.attr('name'),
-            buttonEl: $('button#form-submit')
+            // handle modal UI
+            var modalWidget = new ModalWidget({
+                containerEl: $('#modal-shared'),
+                actions: []
+            });
+
+            // handle admin form, ajax request/response
+            var formWidget = new FormWidget({
+                formEl: formEl,
+                elPrefix: formEl.attr('name'),
+                buttonEl: $('button#form-submit')
+            });
         });
 
     </script>

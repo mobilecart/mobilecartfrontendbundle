@@ -10,6 +10,17 @@
             {{ error.message }}
         </div>
     {% endif %}
+
+    {% for state in ['info', 'warning', 'success', 'danger'] %}
+        {% for idx, flashMessage in app.session.flashbag.get(state) %}
+
+            <div class="alert alert-{{ state }} alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                {{ flashMessage }}
+            </div>
+
+        {% endfor %}
+    {% endfor %}
     </div>
 </div>
 {% endblock %}
@@ -22,7 +33,7 @@
             <h1 class="text-center login-title">Sign in to Continue</h1>
             <div class="account-wall">
 
-                <img class="profile-img" src="{{ asset('bundles/mobilecartfrontend/images/user-icon.svg') }}" alt="">
+                <img class="profile-img" src="{{ frontendAsset('images/user-icon.svg') }}" alt="" />
 
                 <form class="form-signin" action="{{ path('login_check') }}" method="post">
                     <input type="text" id="username"class="form-control" name="_username" value="{{ last_username }}" placeholder="Email" required autofocus />

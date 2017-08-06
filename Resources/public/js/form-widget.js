@@ -1,4 +1,4 @@
-var AdminFormWidget = function(obj) {
+var FormWidget = function(obj) {
     this.formEl = obj.formEl;
     this.elPrefix = obj.elPrefix;
     this.buttonEl = obj.buttonEl;
@@ -6,20 +6,26 @@ var AdminFormWidget = function(obj) {
     return this;
 };
 
-AdminFormWidget.prototype = {
+FormWidget.prototype = {
     attachEvents: function() {
         var widget = this;
 
         // on submit
         widget.formEl.submit(function(e){
             e.preventDefault();
-            var self = $(this);
-            widget.submitForm(self);
+            widget.submitForm();
             return false;
         });
 
+        // on click
+        widget.buttonEl.on('click', function(e){
+            e.preventDefault();
+            widget.submitForm();
+            return true;
+        });
+
     },
-    submitForm: function(formEl) {
+    submitForm: function() {
         var widget = this;
 
         widget.buttonEl.hide();
@@ -28,7 +34,7 @@ AdminFormWidget.prototype = {
         $('.has-error').removeClass('has-error');
         $('.invalid-tab').removeClass('invalid-tab');
 
-        var formAction = formEl.attr('action');
+        var formAction = widget.formEl.attr('action');
         var actionSep = '?';
         if (formAction.indexOf('?') > 0) {
             actionSep = '&';
@@ -37,7 +43,7 @@ AdminFormWidget.prototype = {
         $.ajax({
             type: 'POST',
             url: formAction + actionSep + 'format=json',
-            data: formEl.serialize(),
+            data: widget.formEl.serialize(),
             dataType: 'json',
             success: function(response) {
 

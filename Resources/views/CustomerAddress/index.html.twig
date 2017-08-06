@@ -1,61 +1,46 @@
-{% extends frontend() %}
+{% extends templatePath('Customer:dashboard.html.twig', 'frontend') %}
+{% block main_content %}
+<div class="col-sm-9">
 
-{% block sidebar %}
-<div class="container">
     <div class="row">
-        <div class="col-sm-3">
-            <nav role="navigation" class="navbar-default navbar-static-side ">
-                <div class="sidebar-collapse">
-                    <ul class="side-menu nav">
-                        {% for nav in navigation %}
-                            <li>
-                                <a href="{{ nav.url }}">{{ nav.label }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </nav>
+        <div class="col-xs-12">
+            <h1 class="page-header">{% block header_text %}Addresses{% endblock %}</h1>
         </div>
-{% endblock %}
-{% block content %}
-        <div class="col-sm-9">
+    </div>
 
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h2 class="panel-title">Customer Addresses</h2>
-                        </div>
-                        <div class="panel-body">
+    <div class="row">
+        <div class="col-xs-12 header-buttons">
+            <a href="{{ path('customer_profile') }}" class="btn btn-default">Back</a>
+            <a href="{{ path('customer_address_new') }}" class="btn btn-success">Create</a>
+        </div>
+    </div>
 
-                            {% if result.entities|length > 0 %}
-                            <table class="table table-striped table-bordered table-hover">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>City</th>
-                                    <th>Region</th>
-                                    <th>Country</th>
-                                </tr>
-                                {% for entity in result.entities %}
-                                <tr>
-                                    <td>{{ entity.id }}</td>
-                                    <td><a href="{{ path('customer_address_edit', {'id': entity.id}) }}">{{ entity.name }}</a></td>
-                                    <td>{{ entity.city }}</td>
-                                    <td>{{ entity.region }}</td>
-                                    <td>{{ entity.country_id }}</td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                            {% else %}
-                            <p>No Addresses Found</p>
-                            {% endif %}
-
-                            <a href="{{ path('customer_address_new') }}" class="btn btn-success">Create</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <table class="table table-striped table-bordered table-hover">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>City</th>
+                    <th>Region</th>
+                    <th>Country</th>
+                </tr>
+                {% if result.entities|length > 0 %}
+                    {% for entity in result.entities %}
+                    <tr>
+                        <td>{{ entity.id }}</td>
+                        <td><a href="{{ path('customer_address_edit', {'id': entity.id}) }}">{{ entity.name }}</a></td>
+                        <td>{{ entity.city }}</td>
+                        <td>{{ entity.region }}</td>
+                        <td>{{ entity.country_id }}</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">No Addtl. Addresses Have Been Saved</td>
+                    </tr>
+                {% endif %}
+            </table>
         </div>
     </div>
 </div>

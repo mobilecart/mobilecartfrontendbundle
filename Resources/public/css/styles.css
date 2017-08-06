@@ -49,6 +49,14 @@ h1.store-name {
     overflow-y: auto;
 }
 
+div.header-buttons {
+    margin: 0 0 13px;
+}
+
+h1.page-header {
+    padding: 0;
+    margin: 25px 0 15px;
+}
 
 .typeahead,
 .tt-query,
