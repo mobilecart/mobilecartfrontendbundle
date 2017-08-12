@@ -122,6 +122,9 @@ CheckoutWidget.prototype = {
                     var field = sectionData['fields'][x];
                     var inputId = widget.elPrefix + '_' + sectionKey + '_' + field;
                     var input = $('#' + inputId);
+                    if (input.attr('type') == 'checkbox' && !input.is(':checked')) {
+                        continue;
+                    }
                     postData[field] = input.val();
                 }
 
@@ -130,7 +133,11 @@ CheckoutWidget.prototype = {
                 section.find('input, select, textarea').each(function(e){
                     var input = $(this);
                     var name = input.attr('name');
-                    postData[name] = input.val();
+                    if (input.attr('type') != 'checkbox' ||
+                        (input.attr('type') == 'checkbox' && !input.is(':checked'))
+                        ) {
+                        postData[name] = input.val();
+                    }
                 });
             }
         }

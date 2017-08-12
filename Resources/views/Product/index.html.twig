@@ -131,7 +131,7 @@
                         <div class="row">
                             <div class="col-xs-12">
                                 <form method="post" class="add-to-cart" action="{{ path('cart_add_item', {'id':entity.id}) }}">
-                                    {% if entity.type > 1 %}
+                                    {% if entity.type == 2 %}
                                         <input type="hidden" class="simple_id" name="simple_id" value="" />
 
                                         {% if configDecode(entity.config)|length > 0 %}
@@ -139,14 +139,25 @@
                                         {% endif %}
                                     {% endif %}
 
-                                    {% if entity.is_in_stock %}
-                                        <button type="submit" class="btn btn-primary addtocart pull-right"><i class="glyphicon glyphicon-shopping-cart icon-white"> </i>Add to Cart</button>
-                                    {% elseif entity.can_backorder %}
-                                        <button type="submit" class="btn btn-primary addtocart pull-right">Backorder</button>
+                                    {% if entity.is_in_stock or entity.can_backorder %}
+                                    <div class="row">
+                                        <div class="col-xs-6">
+                                            <label>Qty</label>
+                                            <input type="text" class="form-control" name="qty" value="{% if entity.min_qty > 0 %}{{ entity.min_qty }}{% else %}1{% endif %}" />
+                                        </div>
+                                        <div class="col-xs-6 text-center">
+                                            {% if entity.is_in_stock %}
+                                                <div style="height:15px">&nbsp;</div>
+                                                <button type="submit" class="btn btn-primary addtocart"><i class="glyphicon glyphicon-shopping-cart icon-white"> </i>Add to Cart</button>
+                                            {% elseif entity.can_backorder %}
+                                                <div style="height:15px">&nbsp;</div>
+                                                <button type="submit" class="btn btn-primary addtocart">Backorder</button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
                                     {% else %}
                                         <p>Currently Unavailable</p>
                                     {% endif %}
-
                                 </form>
                             </div>
                         </div>
