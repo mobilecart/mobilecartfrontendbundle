@@ -262,7 +262,7 @@ CheckoutWidget.prototype = {
             buttonEl.siblings('.spinner').hide();
 
             // handle response
-            if (typeof(response['success']) != 'undefined' && response.success == 1) {
+            if (typeof(response['success']) != 'undefined' && response.success == true) {
 
                 // redirect to success page
                 window.location = response.redirect_url;

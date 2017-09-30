@@ -1,22 +1,19 @@
-
+<script type="text/javascript" src="{{ asset(frontendAsset('js/checkout-payment-widget.js')) }}"></script>
 <script type="text/javascript">
 
-    $(function() {
-
-        var selected = $('input.payment-option-input:checked').val();
-        if (typeof selected != 'undefined' && selected.length > 0) {
-            $('div.payment-option-form').hide();
-            $('div.payment-option-form.payment-' + selected).show();
+    $(function(){
+        var section = "payment_method";
+        if (typeof accordion != 'undefined') {
+            accordion.addSection(section);
         }
-
-        // handle radio inputs; show and hide sub-forms
-        $('input.payment-option-input').click(function() {
-            var self = $(this);
-            var code = self.attr('data-code');
-            $('div.payment-option-form').hide();
-            $('div.payment-option-form.payment-' + code).show();
-        });
-
     });
 
+    var paymentWidget = new CheckoutPaymentWidget({
+        containerEl: $('div#section-payment_method'),
+        buttonEl: $('div#section-payment_method a.next-button'),
+        modalEl: $('div#confirm-order-modal'),
+        postUrl: "{{ path('cart_checkout_update_section', {'section':'payment_method'}) }}",
+        confirmOrderUrl: "{{ path('cart_checkout_confirm_order') }}",
+        submitOrderUrl: "{{ path('cart_checkout_submit_order') }}"
+    });
 </script>

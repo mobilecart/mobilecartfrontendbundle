@@ -1,0 +1,107 @@
+<script type="text/javascript">
+    $(function(){
+        var section = "{{ section }}";
+        accordion.addSection(section);
+
+        var containerEl = $('div#section-' + section);
+        var nextButton = containerEl.find('.next-button');
+        var fields = {{ fields|json_encode|raw }};
+        var postUrl = "{{ post_url }}";
+
+        function copyBillingToShipping() {
+            $('.billing-input').each(function(){
+                var billing = $(this);
+                var elId = billing.attr('id');
+                var re = /billing_address/gi;
+                var re2 = /billing/gi;
+                var shippingElId = 'checkout_' + elId.replace(re, 'shipping_address').replace(re2, 'shipping');
+                var shipping = $('#' + shippingElId);
+                shipping.val(billing.val());
+                shipping.attr('disabled', true);
+            });
+        }
+
+        var chkboxEl = containerEl.find('input#checkout_shipping_address_is_shipping_same');
+        if (chkboxEl.length > 0) {
+            chkboxEl.on('click', function(e){
+                if (chkboxEl.is(':checked')) {
+                    copyBillingToShipping();
+                } else {
+                    $('.shipping-input').attr('disabled', false);
+                }
+            });
+        }
+
+        nextButton.on('click', function(e){
+            var self = $(this);
+            self.hide();
+            self.siblings('.spinner').show();
+
+            containerEl.find('.has-error').removeClass('has-error');
+            var postData = {};
+
+            if (fields.length > 0) {
+                for (var x = 0; x < fields.length; x++) {
+                    var field = fields[x];
+                    var inputId = section + '_' + field;
+                    var input = $('#' + inputId);
+                    postData[field] = input.val();
+                }
+            } else {
+                containerEl.find('input, select, textarea').each(function(e){
+                    var input = $(this);
+                    var name = input.attr('name');
+                    postData[name] = input.val();
+                });
+            }
+
+            // send request
+            $.ajax({
+                url: postUrl,
+                dataType: 'json',
+                type: 'POST',
+                data: postData
+            }).error(function(jqxhr, status, errorThrown){
+
+                self.show();
+                self.siblings('.spinner').hide();
+
+            }).done(function(response){
+
+                self.show();
+                self.siblings('.spinner').hide();
+
+                if (typeof(response['success']) != 'undefined' && response.success == true) {
+                    // show next section
+                    accordion.closeAndOpenNextSection(section);
+                } else {
+
+                    var invalid = {};
+                    var errors = [];
+                    if (typeof response['invalid'] != 'undefined') {
+                        invalid = response.invalid;
+                    }
+
+                    if (typeof response['errors'] != 'undefined') {
+                        errors = response.errors;
+                    }
+
+                    for (field in invalid) {
+                        var message = invalid[field];
+                        var inputId = sectionKey + '_' + field;
+                        var inputEl = $('#' + inputId);
+                        inputEl.parent().addClass('has-error');
+                    }
+
+                    if (errors.length > 0) {
+                        for (var x = 0; x < errors.length; x++) {
+                            // todo : display error
+                        }
+                    }
+                }
+
+            });
+        });
+    });
+</script>
+

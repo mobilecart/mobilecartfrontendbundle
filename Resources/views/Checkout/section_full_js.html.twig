@@ -1,0 +1,97 @@
+{% if country_regions is defined %}
+    <script src="{{ asset(frontendAsset('js/country-region-widget.js')) }}" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function(){
+            var countryRegions = {{ country_regions|json_encode|raw }};
+            var countryRegionWidget = new CountryRegionWidget({
+                countryRegions: countryRegions
+            });
+        });
+    </script>
+{% endif %}
+
+<script type="text/javascript">
+    $(function(){
+
+        var form = $('form.checkout-form');
+
+        {% if fields is defined %}
+        var fields = {{ fields|json_encode|raw }};
+        {% else %}
+        var fields = [];
+        {% endif %}
+        var sectionKey = "{{ section }}";
+
+        $('.next-button').click(function(e){
+            var self = $(this);
+            self.hide();
+            self.siblings('.spinner').show();
+
+            form.find('.has-error').removeClass('has-error');
+            var postData = {};
+
+            if (fields.length > 0) {
+                for (var x = 0; x < fields.length; x++) {
+                    var field = fields[x];
+                    var inputId = sectionKey + '_' + field;
+                    var input = $('#' + inputId);
+                    postData[field] = input.val();
+                }
+            } else {
+                form.find('input, select, textarea').each(function(e){
+                    var input = $(this);
+                    var name = input.attr('name');
+                    postData[name] = input.val();
+                });
+            }
+
+            // send request
+            $.ajax({
+                url: "{{ post_url }}",
+                dataType: 'json',
+                type: 'POST',
+                data: postData
+            }).error(function(jqxhr, status, errorThrown){
+
+                self.show();
+                self.siblings('.spinner').hide();
+
+            }).done(function(response){
+
+                self.show();
+                self.siblings('.spinner').hide();
+
+                if (typeof(response['success']) != 'undefined' && response.success == true) {
+                    // show next section
+                    window.location = response.redirect_url;
+                } else {
+
+                    var invalid = {};
+                    var errors = [];
+                    if (typeof response['invalid'] != 'undefined') {
+                        invalid = response.invalid;
+                    }
+
+                    if (typeof response['errors'] != 'undefined') {
+                        errors = response.errors;
+                    }
+
+                    for (field in invalid) {
+                        var message = invalid[field];
+                        var inputId = sectionKey + '_' + field;
+                        var inputEl = $('#' + inputId);
+                        inputEl.parent().addClass('has-error');
+                    }
+
+                    if (errors.length > 0) {
+                        for (var x = 0; x < errors.length; x++) {
+                            // todo : display error
+                        }
+                    }
+                }
+
+            });
+        });
+    });
+
+</script>

@@ -39,7 +39,19 @@
     <script src="{{ asset('bundles/mobilecartfrontend/js/underscore.js') }}"></script>
     <script src="{{ asset('bundles/mobilecartfrontend/js/bootstrap.min.js') }}"></script>
 
-    <!-- add your own js here to further populate App -->
+    {% if javascripts is defined %}
+    {% for javascript in javascripts %}
+        {% if javascript.url is defined %}
+            <script type="text/javascript" src="{{ javascript.url }}"></script>
+        {% elseif javascript.asset is defined %}
+            <script src="{{ asset(javascript.asset) }}" type="text/javascript"></script>
+        {% elseif javascript.js_template is defined and javascript.data is defined %}
+            {% include javascript.js_template with javascript.data %}
+        {% elseif javascript.js_template is defined %}
+            {% include javascript.js_template %}
+        {% endif %}
+    {% endfor %}
+    {% endif %}
 
 {% endblock %}
 
@@ -68,6 +80,33 @@
                         <li><a href="{{ path('cart_categories') }}">Categories</a></li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
+
+                        <li class="dropdown user-menu">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                                <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <li><a href="{{ path('cart_admin_dashboard') }}">Admin Panel</a></li>
+                                    <li><a href="{{ path('logout') }}">Logout</a></li>
+                                {% elseif is_granted('IS_AUTHENTICATED_FULLY') %}
+                                    <li><a href="{{ path('customer_profile') }}">My Account</a></li>
+                                    <li><a href="{{ path('logout') }}">Logout</a></li>
+                                {% else %}
+                                    <li><a href="{{ path('login_route') }}">Login</a></li>
+                                    <li><a href="{{ path('customer_register') }}">Register</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ currencySymbol() }} <b class="caret"></b></a>
+                            <ul class="pull-right dropdown-menu">
+                                <li><a href="{{ path('cart_currency', {'code':'EUR'}) }}">€</a></li>
+                                <li><a href="{{ path('cart_currency', {'code':'USD'}) }}">$</a></li>
+                            </ul>
+                        </li>
+
                         <li class="dropdown header-cart">
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                                 <i class="glyphicon glyphicon-shopping-cart icon-white"> </i>
@@ -105,30 +144,7 @@
                                 </div>
                             </div>
                         </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ currencySymbol() }} <b class="caret"></b></a>
-                            <ul class="pull-right dropdown-menu">
-                                <li><a href="{{ path('cart_currency', {'code':'EUR'}) }}">€</a></li>
-                                <li><a href="{{ path('cart_currency', {'code':'USD'}) }}">$</a></li>
-                            </ul>
-                        </li>
-                        <li class="dropdown user-menu">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
-                                <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-user">
-                                {% if is_granted('ROLE_ADMIN') %}
-                                    <li><a href="{{ path('cart_admin_dashboard') }}">Admin Panel</a></li>
-                                    <li><a href="{{ path('logout') }}">Logout</a></li>
-                                {% elseif is_granted('IS_AUTHENTICATED_FULLY') %}
-                                    <li><a href="{{ path('customer_profile') }}">My Account</a></li>
-                                    <li><a href="{{ path('logout') }}">Logout</a></li>
-                                {% else %}
-                                    <li><a href="{{ path('login_route') }}">Login</a></li>
-                                    <li><a href="{{ path('customer_register') }}">Register</a></li>
-                                {% endif %}
-                            </ul>
-                        </li>
+
                     </ul>
                 </div>
                 {% endblock %}

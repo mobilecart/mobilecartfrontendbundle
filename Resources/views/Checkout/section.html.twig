@@ -1,0 +1,47 @@
+<div class="container">
+    <div class="row">
+        <div class="panel panel-default">
+            <div class="panel-heading section-heading" role="tab" id="heading-{{ section }}">
+                <div class="row">
+                    <div class="col-xs-1">
+                        <div class="img-circle pull-left">{{ step_number }}</div>
+                    </div>
+                    <div class="col-xs-5">
+                        <h2>{{ label }}</h2>
+                    </div>
+                    <div class="col-xs-6 text-right">
+
+                    </div>
+                </div>
+            </div>
+            <div id="section-{{ section }}" class="panel-collapse collapse in section-body" role="tabpanel" aria-labelledby="heading-{{ section }}">
+                <div class="panel-body">
+
+                    {% if fields is defined and form_view is defined %}
+                        {% form_theme form_view 'bootstrap_3_layout.html.twig' %}
+                        {% for field in fields %}
+                            {{ form_row(form_view.offsetGet(field)) }}
+                        {% endfor %}
+                    {% elseif template is defined %}
+                        {% include template %}
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-xs-4">
+
+                        </div>
+                        <div class="col-xs-4">
+                            <a role="button" data-section="{{ section }}" class="btn btn-success form-control next-button {% if final_step is defined %}final-step{% endif %}">Next</a>
+                            <div class="text-center spinner" style="display:none;">
+                                <i class="fa fa-spinner fa-spin fa-3x fa-fw margin-bottom"></i>
+                            </div>
+                        </div>
+                        <div class="col-xs-4">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,34 +1,36 @@
-{% form_theme form 'bootstrap_3_layout.html.twig' %}
+<div class="container">
+    <div class="payment-option row">
+        {% if payment_methods|length > 1 %}
+        <div class="col-sm-2 payment-option-selector">
+            {% set i = 0 %}
+            {% for method in payment_methods %}
+                <div>
+                    <input type="radio" class="payment-option-input payment-{{ method.code }}" data-code="{{ method.code }}" name="payment_method" value="{{ method.code }}" {% if i == 0 %} checked="checked" {% endif %}/>
+                    <label>{{ method.label }}</label>
+                </div>
+                {% set i = i + 1 %}
+            {% endfor %}
+        </div>
+        <div class="col-sm-10">
+        {% else %}
+        <div class="col-xs-12">
+        {% endif %}
 
-<div class="payment-option row">
-    {% if payment_methods|length > 1 %}
-    <div class="col-sm-2 payment-option-selector">
-        {% set i = 0 %}
-        {% for method in payment_methods %}
-            <div>
-                <input type="radio" class="payment-option-input payment-{{ method.code }}" data-code="{{ method.code }}" name="payment_method" value="{{ method.code }}" {% if i == 0 %} checked="checked" {% endif %}/>
-                <label>{{ method.label }}</label>
-            </div>
-            {% set i = i + 1 %}
-        {% endfor %}
-    </div>
-    <div class="col-sm-10">
-    {% else %}
-    <div class="col-xs-12">
-    {% endif %}
+            {% set i = 0 %}
+            {% for method in payment_methods %}
+                {% set form = method.getForm() %}
+                {% form_theme form 'bootstrap_3_layout.html.twig' %}
 
-        {% set i = 0 %}
-        {% for method in payment_methods %}
-            <div class="payment-option-form payment-{{ method.code }}" id="payment-{{ method.code }}" data-code="{{ method.code }}"{% if i > 0 %} style="display: none;"{% endif %}>
-            {# dont break main form with more form tags, markup #}
-            {{ form_widget(method.getForm()) }}
-            {% set i = i + 1 %}
-            </div>
-        {% endfor %}
+                <div class="payment-option-form payment-{{ method.code }}" id="payment-{{ method.code }}" data-code="{{ method.code }}"{% if i > 0 %} style="display: none;"{% endif %}>
+                    {{ form_widget(form) }}
+                    {% set i = i + 1 %}
+                </div>
+            {% endfor %}
+        </div>
+        {% if payment_methods|length == 1 %}
+            {% for method in payment_methods %}
+                <input type="hidden" class="hide payment-option-input payment-{{ method.code }}" data-code="{{ method.code }}" name="payment_method" value="{{ method.code }}" />
+            {% endfor %}
+        {% endif %}
     </div>
-    {% if payment_methods|length == 1 %}
-        {% for method in payment_methods %}
-            <input type="hidden" class="hide payment-option-input payment-{{ method.code }}" data-code="{{ method.code }}" name="payment_method" value="{{ method.code }}" />
-        {% endfor %}
-    {% endif %}
 </div>
