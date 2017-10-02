@@ -101,9 +101,22 @@ CheckoutPaymentWidget.prototype = {
     },
     handlePayment: function() {
         var self = this;
-        var paymentMethod = $('input.payment-option-input:checked').attr('data-code');
-        self.setPaymentMethod(paymentMethod);
-        var postData = self.getMethodPostData(paymentMethod);
+        var paymentMethodEl = $('input.payment-option-input');
+        var paymentMethod = '';
+        var postData = {};
+        if (paymentMethodEl.length > 0) {
+            paymentMethod = $('input.payment-option-input:checked').attr('data-code');
+            self.setPaymentMethod(paymentMethod);
+            postData = self.getMethodPostData(paymentMethod);
+        } else {
+            // get first payment method
+            for(code in self.postDataGetter) {
+                paymentMethod = code;
+                break;
+            }
+            self.setPaymentMethod(paymentMethod);
+            postData = self.getMethodPostData(paymentMethod);
+        }
 
         if (typeof postData.callback == 'undefined') {
             self.submitPayment();

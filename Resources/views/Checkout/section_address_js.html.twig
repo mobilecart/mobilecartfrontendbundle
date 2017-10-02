@@ -14,7 +14,7 @@
                 var elId = billing.attr('id');
                 var re = /billing_address/gi;
                 var re2 = /billing/gi;
-                var shippingElId = 'checkout_' + elId.replace(re, 'shipping_address').replace(re2, 'shipping');
+                var shippingElId = elId.replace(re, 'shipping_address').replace(re2, 'shipping');
                 var shipping = $('#' + shippingElId);
                 shipping.val(billing.val());
                 shipping.attr('disabled', true);
