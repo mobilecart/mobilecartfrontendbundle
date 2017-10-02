@@ -104,18 +104,27 @@ CheckoutPaymentWidget.prototype = {
         var paymentMethodEl = $('input.payment-option-input');
         var paymentMethod = '';
         var postData = {};
-        if (paymentMethodEl.length > 0) {
-            paymentMethod = $('input.payment-option-input:checked').attr('data-code');
-            self.setPaymentMethod(paymentMethod);
-            postData = self.getMethodPostData(paymentMethod);
-        } else {
-            // get first payment method
-            for(code in self.postDataGetter) {
-                paymentMethod = code;
+
+        switch(paymentMethodEl.length) {
+            case 0:
+                // get first payment method
+                for(code in self.postDataGetter) {
+                    paymentMethod = code;
+                    break;
+                }
+                self.setPaymentMethod(paymentMethod);
+                postData = self.getMethodPostData(paymentMethod);
                 break;
-            }
-            self.setPaymentMethod(paymentMethod);
-            postData = self.getMethodPostData(paymentMethod);
+            case 1:
+                paymentMethod = paymentMethodEl.attr('data-code');
+                self.setPaymentMethod(paymentMethod);
+                postData = self.getMethodPostData(paymentMethod);
+                break;
+            default:
+                paymentMethod = $('input.payment-option-input:checked').attr('data-code');
+                self.setPaymentMethod(paymentMethod);
+                postData = self.getMethodPostData(paymentMethod);
+                break;
         }
 
         if (typeof postData.callback == 'undefined') {
