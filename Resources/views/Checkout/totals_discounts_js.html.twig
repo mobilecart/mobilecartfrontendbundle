@@ -13,6 +13,12 @@ $(function(){
         updateQtyUrl: '{{ path('cart_update_qtys', {'format':'json'}) }}'
     });
 
+    accordion.addSectionCallback(section, function(){
+        cartWidget.render(function(){
+            accordion.openSection(section);
+        });
+    });
+
     var containerEl = $('div#section-' + section);
     var nextButton = containerEl.find('.next-button');
     var postUrl = "{{ post_url }}";

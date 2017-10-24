@@ -45,13 +45,27 @@
                     var field = fields[x];
                     var inputId = section + '_' + field;
                     var input = $('#' + inputId);
-                    postData[field] = input.val();
+                    var value = input.val();
+                    if (input.is(':checkbox')) {
+                        if (input.is(':checked')) {
+                            postData[field] = value;
+                        }
+                    } else {
+                        postData[field] = value;
+                    }
                 }
             } else {
                 containerEl.find('input, select, textarea').each(function(e){
                     var input = $(this);
                     var name = input.attr('name');
-                    postData[name] = input.val();
+                    var value = input.val();
+                    if (input.is(':checkbox')) {
+                        if (input.is(':checked')) {
+                            postData[name] = value;
+                        }
+                    } else {
+                        postData[name] = value;
+                    }
                 });
             }
 

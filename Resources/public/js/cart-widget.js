@@ -97,12 +97,16 @@ CartWidget.prototype = {
             self.render();
         });
     },
-    render: function() {
+    render: function(callback) {
         var self = this;
+
         $.ajax({
             url: self.url
         }).done(function(html){
             self.containerEl.find('div.panel-body div.container').replaceWith(html);
+            if (typeof callback != 'undefined') {
+                callback();
+            }
         });
 
         return self;

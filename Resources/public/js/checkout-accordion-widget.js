@@ -1,5 +1,6 @@
 var CheckoutAccordion = function(obj) {
     this.sections = [];
+    this.sectionCallbacks = [];
     this.attachEvents();
     return this;
 };
@@ -19,6 +20,31 @@ CheckoutAccordion.prototype = {
     addSection: function(section) {
         this.sections.push(section);
         return this;
+    },
+    addSectionCallback: function(section, callback) {
+        this.sectionCallbacks.push({
+            section: section,
+            callback: callback
+        });
+        return this;
+    },
+    getSections: function() {
+        return this.sections;
+    },
+    hasSection: function(section) {
+        return this.sections.indexOf(section) > -1;
+    },
+    sectionHasCallback: function(section) {
+        var widget = this;
+        if (widget.sectionCallbacks.length > 0) {
+            for (var x = 0; x < widget.sectionCallbacks.length; x++) {
+                var sectionCallback = widget.sectionCallbacks[x];
+                if (sectionCallback.section == section) {
+                    return true;
+                }
+            }
+        }
+        return false;
     },
     getNextSection: function(section) {
         var widget = this;
@@ -56,7 +82,16 @@ CheckoutAccordion.prototype = {
         widget.closeSection(section);
         var nextSection = widget.getNextSection(section);
         if (nextSection.length > 0) {
-            widget.openSection(nextSection);
+            if (widget.sectionHasCallback(nextSection)) {
+                for (var x = 0; x < widget.sectionCallbacks.length; x++) {
+                    var sectionCallback = widget.sectionCallbacks[x];
+                    if (sectionCallback.section == nextSection) {
+                        sectionCallback.callback();
+                    }
+                }
+            } else {
+                widget.openSection(nextSection);
+            }
         }
         return widget;
     }
