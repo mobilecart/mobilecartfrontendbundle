@@ -130,7 +130,7 @@
 
                         <div class="row">
                             <div class="col-xs-12">
-                                <form method="post" class="add-to-cart" action="{{ path('cart_add_item', {'id':entity.id}) }}">
+                                <form method="post" class="add-to-cart" action="{{ path('cart_add_item', {'product_id': entity.id}) }}">
                                     {% if entity.type == 2 %}
                                         <input type="hidden" class="simple_id" name="simple_id" value="" />
 

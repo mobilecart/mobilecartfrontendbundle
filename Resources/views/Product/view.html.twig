@@ -34,7 +34,7 @@
                 <p class="price">{{ decorate(entity.price) }}</p>
             </div>
             <div class="add-to-cart">
-                <form method="post" class="add-to-cart" action="{{ path('cart_add_item', {'id': entity.id}) }}">
+                <form method="post" class="add-to-cart" action="{{ path('cart_add_item', {'product_id': entity.id}) }}">
 
                     {# Handle Configurable Product UI #}
                     {% if entity.type == 2 %}

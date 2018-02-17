@@ -9,8 +9,21 @@
         </div>
 
         <div class="row">
-            <div class="col-xs-12 header-buttons">
+            <div class="col-xs-6 header-buttons">
                 <a href="{{ path('customer_profile') }}" class="btn btn-default">Back</a>
+            </div>
+            <div class="col-xs-6 pull-right">
+                <form id="pager-form">
+                <div class="pull-right btn-group input-group paginator" role="group">
+                    <button type="button" class="btn pull-left btn-default prev {% if search.page == 1 %}disabled{% endif %}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </button>
+                    <input type="number" id="page" class="form-control number paginator" name="{{ search.pageParam }}" value="{{ search.page }}" />
+                    <button type="button" class="btn pull-right btn-default next {% if search.page >= result.pages %}disabled{% endif %}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </button>
+                </div>
+                </form>
             </div>
         </div>
 
@@ -24,15 +37,15 @@
                         <th>Status</th>
                         <th>Total</th>
                     </tr>
-                    {% if orders|length > 0 %}
-                        {% for order in orders %}
+                    {% if result.entities|length > 0 %}
+                        {% for order in result.entities %}
                             <tr>
                                 <td>
-                                    <a href="{{ path('customer_order', {'id': order.id}) }}">{{ order.referencenbr }}</a>
+                                    <a href="{{ path('customer_order', {'id': order.id}) }}">{{ order.reference_nbr }}</a>
                                 </td>
                                 <td>{{ order.status }}</td>
-                                <td>{{ order.createdat|date('m/d/Y') }}</td>
-                                <td>{{ decorate(order.basetotal) }}</td>
+                                <td>{{ order.created_at|date('m/d/Y') }}</td>
+                                <td>{{ decorate(order.base_total) }}</td>
                             </tr>
                         {% endfor %}
                     {% else %}
@@ -45,4 +58,33 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $(function(){
+
+            var pagerForm = $('form#pager-form');
+
+            // paginator previous
+            $('button.prev').click(function(e){
+                e.preventDefault();
+                var el = $('input#page');
+                var page = parseInt(el.val()) - 1;
+                el.val(page);
+                pagerForm.submit();
+                return false;
+            });
+
+            // paginator next
+            $('button.next').click(function(e){
+                e.preventDefault();
+                var el = $('input#page');
+                var page = parseInt(el.val()) + 1;
+                el.val(page);
+                pagerForm.submit();
+                return false;
+            });
+        });
+    </script>
 {% endblock %}

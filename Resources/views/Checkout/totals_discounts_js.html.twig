@@ -9,8 +9,8 @@ $(function(){
     var cartWidget = new CartWidget({
         containerEl: $('div#section-totals_discounts'),
         url: '{{ path('cart_checkout_section', {'section':'totals_discounts', 'ajax':'1'}) }}',
-        updateShippingUrl: '{{ path('cart_shipment_add', {'format':'json'}) }}',
-        updateQtyUrl: '{{ path('cart_update_qtys', {'format':'json'}) }}'
+        updateShippingUrl: '{{ path('cart_shipment_add') }}',
+        updateQtyUrl: '{{ path('cart_update_qtys') }}'
     });
 
     accordion.addSectionCallback(section, function(){
@@ -42,6 +42,10 @@ $(function(){
         $.ajax({
             url: postUrl,
             dataType: 'json',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'text/plain; charset=utf-8'
+            },
             type: 'POST',
             data: postData
         }).error(function(jqxhr, status, errorThrown){
