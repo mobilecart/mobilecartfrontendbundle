@@ -3,6 +3,7 @@ var CartWidget = function(obj) {
     this.url = obj.url;
     this.updateShippingUrl = obj.updateShippingUrl;
     this.updateQtyUrl = obj.updateQtyUrl;
+    this.updateCallback = obj.updateCallback;
     this.attachEvents();
     return this;
 };
@@ -10,6 +11,7 @@ var CartWidget = function(obj) {
 CartWidget.prototype = {
     containerEl: {},
     url: '',
+    updateCallback: null,
     attachEvents: function() {
         var self = this;
 
@@ -39,7 +41,7 @@ CartWidget.prototype = {
             });
         });
 
-        self.containerEl.on('change', 'select.multi-shipping', function(){
+        self.containerEl.on('change', 'select.multi-shipping', function(e){
 
             self.containerEl.find('div.totals-container .spinner').show();
 
@@ -60,33 +62,35 @@ CartWidget.prototype = {
             });
         });
 
-        self.containerEl.on('change', 'input.qty-input', function(){
+        self.containerEl.on('change', 'input.qty-input', function(e){
             self.updateCart();
         });
 
-        self.containerEl.on('change', 'select.product-shipping', function(){
+        self.containerEl.on('change', 'select.product-shipping', function(e){
             self.updateCart();
         });
 
     },
     updateCart: function() {
         var self = this;
-        // first gather all qty inputs, and their values
 
-        self.containerEl.find('div.totals-container .spinner').show();
+        self.containerEl.find('.spinner').show();
 
         var postData = {};
+
+        // first gather all qty inputs, and their values
         self.containerEl.find('input.qty-input').each(function(){
             var qtyInput = $(this);
             var key = qtyInput.attr('name');
             postData[key] = qtyInput.val();
         });
 
+        /*
         $('select.product-shipping').each(function(){
             var self = $(this);
             var name = self.attr('name');
             postData[name] = self.val();
-        });
+        }); //*/
 
         $.ajax({
             url: self.updateQtyUrl,
@@ -97,15 +101,17 @@ CartWidget.prototype = {
             self.render();
         });
     },
-    render: function(callback) {
+    render: function(skipCallback) {
         var self = this;
+
+        self.containerEl.find('.spinner').show();
 
         $.ajax({
             url: self.url
         }).done(function(html){
-            self.containerEl.find('div.panel-body div.container').replaceWith(html);
-            if (typeof callback != 'undefined') {
-                callback();
+            self.containerEl.html(html);
+            if (skipCallback != true && typeof self.updateCallback != 'undefined') {
+                self.updateCallback();
             }
         });
 
