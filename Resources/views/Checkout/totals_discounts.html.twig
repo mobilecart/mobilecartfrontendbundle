@@ -9,7 +9,7 @@
                         <th>Sku</th>
                         <th>Price</th>
                         <th>Qty</th>
-                        {% if is_shipping_enabled and is_multi_shipping_enabled %}
+                        {% if isShippingEnabled() and isMultiShippingEnabled() %}
                         <th>Address</th>
                         {% endif %}
                     </tr>
@@ -21,7 +21,7 @@
                         <td>{{ cart_item.sku }}</td>
                         <td>{{ decorate(cart_item.price) }}</td>
                         <td><input class="form-control qty-input" type="number" name="qty[{{ cart_item.product_id }}]" value="{{ cart_item.qty }}" /></td>
-                        {% if is_shipping_enabled and is_multi_shipping_enabled and customerAddresses()|length > 1 %}
+                        {% if isShippingEnabled() and isMultiShippingEnabled() and customerAddresses()|length > 1 %}
                             <td>
                                 <select name="product_address[{{ cart_item.product_id }}]" class="form-control product-shipping">
                                     {% for address in customerAddresses() %}
@@ -40,7 +40,7 @@
     <div class="row">
         <div class="col-sm-6">
 
-        {% if is_shipping_enabled %}
+        {% if isShippingEnabled() %}
 
             <table class="table table-striped table-bordered table-hover">
                 <thead>
@@ -56,7 +56,7 @@
                             <tr>
                                 <td>{{ addressLabel(address_id) }}</td>
                                 <td class="text-center">
-                                    <select name="shipping_methods[{{ src_address_key }}][{{ address_id }}]" class="form-control{% if is_multi_shipping_enabled %} multi-shipping{% endif %}">
+                                    <select {% if isMultiShippingEnabled() %}name="shipping_methods[{{ src_address_key }}][{{ address_id }}]" class="form-control multi-shipping"{% else %}name="shipping_method" class="form-control"{% endif %}>
                                         {% for method in methods %}
                                             <option value="{{ method.code }}"{% if cartHasShipmentMethodCode(method.code, address_id, src_address_key) %} selected="selected"{% endif %}>{{ method.company }} {{ method.method }}  {{ decorate(method.price) }}</option>
                                         {% endfor %}

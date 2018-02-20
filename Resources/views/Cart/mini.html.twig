@@ -1,0 +1,68 @@
+{% if cartItems()|length > 0 %}
+    <div class="row">
+        <div class="col-xs-6">
+        {% if cartItems()|length == 1 %}
+            <p><strong>1</strong> Item in Cart</p>
+        {% else %}
+            <p><strong>{{ cartItems()|length }}</strong> Items in Cart</p>
+        {% endif %}
+        </div>
+        <div class="col-xs-6">
+            <p>Cart Subtotal
+                <br><strong>{{ itemTotal() }}</strong>
+                <i class="spinner fa fa-spinner fa-spin fa-fw margin-bottom" style="display:none;"></i>
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <a role="button" href="{{ path('cart_checkout') }}" class="btn btn-success form-control">Checkout</a>
+        </div>
+    </div>
+{% else %}
+    <div class="row">
+        <div class="col-xs-12 text-center">
+            <p>You have no items in your Cart</p>
+        </div>
+    </div>
+{% endif %}
+
+{% for item in cartItems() %}
+    <hr>
+    <div class="row">
+        <div class="col-xs-4">
+            {% if item.get('parent_options')|length > 0 %}
+                <a href="{{ path('cart_product_view', { 'slug': item.parent_options.slug }) }}">
+                    <img class="img-responsive" width="80" height="80" src="{{ asset(imagePath('product', item, 'list_grid')) }}" alt="{{ item.get('name') }}" />
+                </a>
+            {% else %}
+                <a href="{{ path('cart_product_view', { 'slug': item.slug }) }}">
+                    <img class="img-responsive" width="80" height="80" src="{{ asset(imagePath('product', item, 'list_grid')) }}" alt="{{ item.get('name') }}" />
+                </a>
+            {% endif %}
+        </div>
+        <div class="col-xs-4">
+            {% if item.get('parent_options')|length > 0 %}
+                <a href="{{ path('cart_product_view', { 'slug': item.parent_options.slug }) }}">
+                    {{ item.get('name') }}
+                </a>
+            {% else %}
+                <a href="{{ path('cart_product_view', { 'slug': item.slug }) }}">
+                    {{ item.get('name') }}
+                </a>
+            {% endif %}
+            <br><strong>{{ decorate(item.get('price')) }}</strong>
+        </div>
+        <div class="col-xs-4">
+            <input class="form-control qty-input" type="number" name="qty[{{ item.product_id }}]" value="{{ item.qty }}" />
+        </div>
+    </div>
+
+{% endfor %}
+<hr>
+<div class="row">
+    <div class="col-xs-12 text-center">
+        <a href="{{ path('cart_view') }}" class="">View Cart</a>
+    </div>
+</div>

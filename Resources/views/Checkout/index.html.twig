@@ -40,13 +40,14 @@
                     <div id="section-{{ section }}" class="panel-collapse collapse{% if i == 0 %} in{% endif %} section-body" role="tabpanel" aria-labelledby="heading-{{ section }}">
                         <div class="panel-body">
 
-                            {% if sectionData.fields is defined and sectionData.form_view is defined %}
+
+                            {% if sectionData.template is defined %}
+                                {% include sectionData.template with sectionData %}
+                            {% elseif sectionData.fields is defined and sectionData.form_view is defined %}
                                 {% form_theme sectionData.form_view 'bootstrap_3_layout.html.twig' %}
                                 {% for field in sectionData.fields %}
                                     {{ form_row(sectionData.form_view.offsetGet(field)) }}
                                 {% endfor %}
-                            {% elseif sectionData.template is defined %}
-                                {% include sectionData.template with sectionData %}
                             {% endif %}
 
                             <div class="row">

@@ -10,13 +10,12 @@ $(function(){
         containerEl: $('div#section-totals_discounts'),
         url: '{{ path('cart_checkout_section', {'section':'totals_discounts', 'ajax':'1'}) }}',
         updateShippingUrl: '{{ path('cart_shipment_add') }}',
-        updateQtyUrl: '{{ path('cart_update_qtys') }}'
+        updateQtyUrl: '{{ path('cart_update_qtys') }}',
+        updateCallback: function(){ accordion.openSection(section); }
     });
 
     accordion.addSectionCallback(section, function(){
-        cartWidget.render(function(){
-            accordion.openSection(section);
-        });
+        cartWidget.render();
     });
 
     var containerEl = $('div#section-' + section);
