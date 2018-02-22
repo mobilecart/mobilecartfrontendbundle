@@ -23,7 +23,6 @@
                     j = (j = i.length) > 3 ? j % 3 : 0;
             return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
         };
-
     </script>
 
     <script type="text/javascript">
@@ -61,6 +60,7 @@
             updateShippingUrl: '{{ path('cart_shipment_add') }}',
             updateQtyUrl: '{{ path('cart_update_qtys') }}',
             updateCallback: function() {
+                // if you have both minicart and another cart on the same page
                 if (typeof cartWidget != 'undefined') {
                     cartWidget.render(true);
                 }
@@ -78,6 +78,8 @@
 
     </script>
 
+    {% include templatePath('Shared:js-autocomplete.html.twig') %}
+
 {% endblock %}
 
 {% block body %}
@@ -88,23 +90,70 @@
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div class="container">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
+
+                <div class="row">
+                    <div class="col-xs-2 home-link">
+                        <ul class="nav navbar-nav">
+                            <li>
+                                <a class="navbar-link" href="{{ path('cart_home') }}">
+                                    <i class="glyphicon glyphicon-home"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-xs-8 searchbox-container">
+                        <form id="pager-form" action="{{ path('cart_products') }}">
+                        <div id="scrollable-dropdown-menu" class="input-group search-bar">
+                        {% if app.request.get('q', '')|length > 0 %}
+                            <span class="input-group-btn">
+                                <button class="btn btn-default search-clear" type="button">
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                </button>
+                            </span>
+                        {% endif %}
+
+                            <input type="text"
+                                   data-provide="typeahead"
+                                   autocomplete="off"
+                                   id="text-search"
+                                   class="form-control search-query typeahead"
+                                   name="q"
+                                   value="{{ app.request.get('q', '') }}"
+                                   placeholder="Search..." />
+
+                            <span class="input-group-btn">
+                                    <button class="btn btn-default search-submit" type="button">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                        </div>
+                        </form>
+                    </div>
+                    <div class="col-xs-2">
+                        <button type="button" class="navbar-toggle pull-right" data-toggle="collapse" data-target=".navbar-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
+                </div>
+
             </div>
             <div class="header-links">
 
                 {% block navigation %}
                 <div class="collapse navbar-collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        <li><a href="{{ path('cart_home') }}">Home</a></li>
-                        <li><a href="{{ path('cart_products') }}">Products</a></li>
-                        <li><a href="{{ path('cart_categories') }}">Categories</a></li>
-                    </ul>
+
                     <ul class="nav navbar-nav navbar-right">
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ currencySymbol() }} <b class="caret"></b></a>
+                            <ul class="pull-right dropdown-menu">
+                                <li><a href="{{ path('cart_currency', {'code':'EUR'}) }}">€</a></li>
+                                <li><a href="{{ path('cart_currency', {'code':'USD'}) }}">$</a></li>
+                            </ul>
+                        </li>
 
                         <li class="dropdown user-menu">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
@@ -122,24 +171,6 @@
                                     <li><a href="{{ path('customer_register') }}">Register</a></li>
                                 {% endif %}
                             </ul>
-                        </li>
-
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ currencySymbol() }} <b class="caret"></b></a>
-                            <ul class="pull-right dropdown-menu">
-                                <li><a href="{{ path('cart_currency', {'code':'EUR'}) }}">€</a></li>
-                                <li><a href="{{ path('cart_currency', {'code':'USD'}) }}">$</a></li>
-                            </ul>
-                        </li>
-
-                        <li class="dropdown header-cart">
-                            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                                <i class="glyphicon glyphicon-shopping-cart icon-white"> </i>
-                                <b class="caret"></b>
-                            </a>
-                            <div class="dropdown-menu cart-dropdown">
-                                {% include templatePath('Cart:mini.html.twig') %}
-                            </div>
                         </li>
 
                     </ul>

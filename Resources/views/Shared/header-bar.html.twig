@@ -1,37 +1,19 @@
 
 <div class="row">
-    <div class="col-sm-6 brand-logo">
-        <i class="fa fa-shopping-cart fa-5x pull-left"></i>
-        <h1 class="store-name">COMPANY NAME</h1>
+    <div class="col-xs-6">
+        <ul class="nav navbar-nav nav-tabs">
+            <li><a class="navbar-link" href="{{ path('cart_products') }}">Products</a></li>
+            <li><a class="navbar-link" href="{{ path('cart_categories') }}">Categories</a></li>
+        </ul>
     </div>
-    <div class="col-sm-6 search-bar">
-        <div class="search-bar-links">
-            <a href="{{ path('cart_view') }}">Cart</a> | <a href="{{ path('cart_checkout') }}">Checkout</a>
-        </div>
-        <div id="scrollable-dropdown-menu" class="input-group">
-
-            {% if search.query|length > 0 %}
-                <span class="input-group-btn">
-                    <button class="btn btn-default search-clear" type="button">
-                        <i class="glyphicon glyphicon-remove"></i>
-                    </button>
-                </span>
-            {% endif %}
-
-                <input type="text"
-                       data-provide="typeahead"
-                       autocomplete="off"
-                       id="text-search"
-                       class="form-control search-query typeahead"
-                       name="{{ search.queryparam }}"
-                       value="{{ search.query }}"
-                       placeholder="Search..." />
-
-                <span class="input-group-btn">
-                    <button class="btn btn-default search-submit" type="button">
-                        <i class="fa fa-search"></i>
-                    </button>
-                </span>
+    <div class="col-xs-6">
+        <div class="pull-right cart-btn">
+            <a data-toggle="dropdown" class="dropdown-toggle cart-btn-link" href="#">
+                <i class="fa fa-shopping-cart fa-3x"></i>
+            </a>
+            <div class="dropdown-menu cart-dropdown">
+                {% include templatePath('Cart:mini.html.twig') %}
+            </div>
         </div>
     </div>
 </div>

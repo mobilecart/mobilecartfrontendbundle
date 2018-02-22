@@ -1,15 +1,13 @@
 {% extends frontend() %}
 {% block javascripts %}
     {{ parent() }}
-    {% include templatePath('Shared:js-autocomplete.html.twig') %}
+
 {% endblock %}
 {% block content %}
 
 <div class="container">
 
-    <form id="pager-form" action="{{ path('cart_products') }}">
     {% include templatePath('Shared:header-bar.html.twig') %}
-    </form>
 
     <div class="row">
         <div class="col-md-12">

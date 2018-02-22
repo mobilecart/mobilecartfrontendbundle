@@ -9,6 +9,7 @@
             updateShippingUrl: '{{ path('cart_shipment_add') }}',
             updateQtyUrl: '{{ path('cart_update_qtys') }}',
             updateCallback: function() {
+                // if you have both minicart and another cart on the same page
                 if (typeof minicartWidget != 'undefined') {
                     minicartWidget.render(true);
                 }
@@ -18,7 +19,9 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container totals-discounts-container">
-        {% include templatePath('Cart:partial.html.twig') %}
+    <div class="container">
+        <div class="totals-discounts-container">
+            {% include templatePath('Cart:partial.html.twig') %}
+        </div>
     </div>
 {% endblock %}

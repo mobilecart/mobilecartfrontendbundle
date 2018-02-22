@@ -180,8 +180,7 @@
 {% endblock %}
 
 {% block javascripts %}
-{{ parent() }}
-    {% include templatePath('Shared:js-autocomplete.html.twig') %}
+    {{ parent() }}
     <script type="text/javascript" src="{{ asset('bundles/mobilecartcore/js/config-product-addtocart.js') }}"></script>
     <script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/listing-pager.js') }}"></script>
     <script type="text/javascript">

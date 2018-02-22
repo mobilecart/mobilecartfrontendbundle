@@ -21,7 +21,7 @@ CartWidget.prototype = {
         // change shipping method
         // change promo code, update
 
-        self.containerEl.on('change', 'input[name="shipping_method"]', function(){
+        self.containerEl.on('change', 'select[name="shipping_method"]', function(){
 
             self.containerEl.find('div.totals-container .spinner').show();
 

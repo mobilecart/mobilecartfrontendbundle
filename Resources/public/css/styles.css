@@ -16,6 +16,7 @@ h1.store-name {
 
 .carousel-holder {
     margin-bottom: 30px;
+    margin-top: 15px;
 }
 
 .carousel-control,.item {
@@ -197,16 +198,17 @@ div.tab-panel {
     /*height: 34px;*/
 }
 
+
 div.searchbox-container {
-    width: 77%;
-    padding-left: 15px;
+    margin-top: 5px;
 }
 
+/*
 @media(min-width:768px) {
     div.searchbox-container {
         width: 240px;
     }
-}
+}*/
 
 .selectize-dropdown-content img{ width:20px; height:20px; margin-right: 3px; float:left; }
 
@@ -256,6 +258,17 @@ div.cart-dropdown {
     padding: 10px;
 }
 
+div.cart-btn {
+    padding:10px;
+    background:#fff;
+    border-radius:50%;
+    border: 1px solid #4cae4c;
+}
+
+a.cart-btn-link {
+    color: #5cb85c;
+}
+
 div.cart-buttons {
     padding: 5px 0;
 }
@@ -271,6 +284,10 @@ input#page {
 
 div.pager {
     margin: 0;
+}
+
+div.home-link {
+    padding-left: 25px;
 }
 
 input[type="number"] {

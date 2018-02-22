@@ -7,7 +7,6 @@
 
 {% block javascripts %}
 {{ parent() }}
-    {% include templatePath('Shared:js-autocomplete.html.twig') %}
     {% include templatePath('Shared:js-productconfig.html.twig') %}
 {% endblock %}
 
@@ -15,9 +14,7 @@
 
 <div class="container">
 
-    <form id="pager-form" action="{{ path('cart_products') }}">
     {% include templatePath('Shared:header-bar.html.twig') %}
-    </form>
 
     <div class="row">
         <div class="col-xs-12">
