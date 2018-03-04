@@ -181,8 +181,8 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartcore/js/config-product-addtocart.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('bundles/mobilecartfrontend/js/listing-pager.js') }}"></script>
+    <script type="text/javascript" src="{{ asset(frontendAsset('js/config-product-addtocart.js')) }}"></script>
+    <script type="text/javascript" src="{{ asset(frontendAsset('js/listing-pager.js')) }}"></script>
     <script type="text/javascript">
         $(function(){
             $('div.product.type-2').each(function(){

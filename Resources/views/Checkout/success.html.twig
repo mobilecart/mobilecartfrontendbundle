@@ -46,8 +46,8 @@
                     <h3 class="panel-title">Billing Address</h3>
                 </div>
                 <div class="panel-body">
-                    <div>{{ order.billingname }}</div>
-                    <div>{{ order.billingstreet }}</div>
+                    <div>{{ order.billingfirstname }} {{ order.billinglastname }}</div>
+                    <div>{{ order.billingstreet }} {{ order.billingstreet2 }}</div>
                     <div>{{ order.billingcity }}, {{ order.billingregion }} {{ order.billingpostcode }}</div>
                     <div>{{ order.billingcountryid }}</div>
                 </div>
@@ -71,8 +71,8 @@
                         {% for shipment in order.shipments %}
                             <tr>
                                 <td>
-                                    {{ shipment.name }}
-                                    <br>{{ shipment.street }}
+                                    {{ shipment.firstname }} {{ shipment.lastname }}
+                                    <br>{{ shipment.street }} {{ shipment.street2 }}
                                     <br>{{ shipment.city }}, {{ shipment.region }} {{ shipment.postcode }}
                                     <br>{{ shipment.countryid }}
                                 </td>

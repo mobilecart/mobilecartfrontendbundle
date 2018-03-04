@@ -19,13 +19,13 @@
                 </ol>
                 <div class="carousel-inner">
                     <div class="item active">
-                        <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
+                        <img class="slide-image" src="{{ asset(frontendAsset('images/800x300.gif')) }}" alt="" />
                     </div>
                     <div class="item">
-                        <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
+                        <img class="slide-image" src="{{ asset(frontendAsset('images/800x300.gif')) }}" alt="" />
                     </div>
                     <div class="item">
-                        <img class="slide-image" src="{{ asset('bundles/mobilecartfrontend/images/800x300.gif') }}" alt="">
+                        <img class="slide-image" src="{{ asset(frontendAsset('images/800x300.gif')) }}" alt="" />
                     </div>
                 </div>
                 <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
@@ -83,7 +83,7 @@
     </form>
     <div class="row category-list">
 
-    {% if result.entities is defined and not isSpaEnabled() %}
+    {% if result.entities is defined %}
         {% for entity in result.entities %}
             <div class="col-sm-4 col-lg-4 col-md-4">
                 <div class="thumbnail">
@@ -115,7 +115,6 @@
 {% block javascripts %}
     {{ parent() }}
 
-    <script type="text/javascript" src="{{ frontendAsset('js/config-product-addtocart.js') }}"></script>
-    <script type="text/javascript" src="{{ frontendAsset('js/listing-pager.js') }}"></script>
-
+    <script type="text/javascript" src="{{ asset(frontendAsset('js/config-product-addtocart.js')) }}"></script>
+    <script type="text/javascript" src="{{ asset(frontendAsset('js/listing-pager.js')) }}"></script>
 {% endblock %}

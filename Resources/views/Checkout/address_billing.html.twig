@@ -1,8 +1,21 @@
 {% form_theme form_view 'bootstrap_3_layout.html.twig' %}
-{{ form_row(form_view.offsetGet('billing_name')) }}
-{{ form_row(form_view.offsetGet('billing_company')) }}
-{# todo: if email is defined #}
-{{ form_row(form_view.offsetGet('billing_phone')) }}
+
+<div class="row">
+    <div class="col-xs-12 col-md-6 col-lg-6">
+        {{ form_row(form_view.offsetGet('billing_firstname')) }}
+    </div>
+    <div class="col-xs-12 col-md-6 col-lg-6">
+        {{ form_row(form_view.offsetGet('billing_lastname')) }}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12 col-md-6 col-lg-6">
+        {{ form_row(form_view.offsetGet('billing_company')) }}
+    </div>
+    <div class="col-xs-12 col-md-6 col-lg-6">
+        {{ form_row(form_view.offsetGet('billing_phone')) }}
+    </div>
+</div>
 <div class="row">
     <div class="col-xs-12 col-md-6 col-lg-6">
         {{ form_row(form_view.offsetGet('billing_street')) }}
@@ -16,14 +29,18 @@
         {{ form_row(form_view.offsetGet('billing_country_id')) }}
     </div>
     <div class="col-xs-12 col-md-6 col-lg-6">
-        {{ form_row(form_view.offsetGet('billing_postcode')) }}
+        {{ form_row(form_view.offsetGet('billing_region')) }}
     </div>
+
 </div>
 <div class="row">
     <div class="col-xs-12 col-md-6 col-lg-6">
         {{ form_row(form_view.offsetGet('billing_city')) }}
     </div>
     <div class="col-xs-12 col-md-6 col-lg-6">
-        {{ form_row(form_view.offsetGet('billing_region')) }}
+        {{ form_row(form_view.offsetGet('billing_postcode')) }}
     </div>
 </div>
+
+{# todo: if email is defined #}
+{{ form_row(form_view.offsetGet('is_shipping_same')) }}

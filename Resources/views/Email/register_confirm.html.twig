@@ -1,7 +1,7 @@
 {% extends layout('email') %}
 
 {% block content %}
-<p>Hello {{ first_name }} {{ last_name }},</p>
+<p>Hello {{ billing_firstname }} {{ billing_lastname }},</p>
 <p>Thank you again for being a customer.</p>
 <p>Please click this link to confirm your account: <a href="{{ url }}">{{ url }}</a> .</p>
 {% endblock %}
